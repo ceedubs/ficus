@@ -2,8 +2,8 @@ package ceedubs.config.readers
 
 import com.typesafe.config.Config
 
-trait StringConfigValueReader {
-  implicit val StringValueReader: ConfigValueReader[String] = new ConfigValueReader[String] {
+trait StringReader {
+  implicit val StringValueReader: ValueReader[String] = new ValueReader[String] {
     def get(config: Config, path: String): String = config.getString(path)
   }
 }

@@ -1,6 +1,6 @@
 package ceedubs.config.readers
 
-trait AllValueReaderInstances extends AnyValConfigValueReaders with StringConfigValueReader with OptionConfigValueReaders
-    with CollectionConfigValueReaders
+trait AllValueReaderInstances extends AnyValReaders with StringReader with OptionReaders
+    with CollectionReaders
 
 object AllValueReaderInstances extends AllValueReaderInstances

@@ -3,7 +3,7 @@ package ceedubs.config.readers
 import com.typesafe.config.ConfigFactory
 import ceedubs.config.Spec
 
-class AnyValConfigValueReadersSpec extends Spec with AnyValConfigValueReaders { def is =
+class AnyValReadersSpec extends Spec with AnyValReaders { def is =
   "The Boolean value reader should" ^
     "read a true" ! booleanReadTrue ^
     "read a false" ! booleanReadFalse ^

@@ -3,7 +3,7 @@ package ceedubs.config.readers
 import ceedubs.config.Spec
 import com.typesafe.config.ConfigFactory
 
-class CollectionConfigValueReadersSpec extends Spec with CollectionConfigValueReaders { def is =
+class CollectionReadersSpec extends Spec with CollectionReaders { def is =
   "The List value reader should" ^
     "read a list" ! readList ^
                              end ^

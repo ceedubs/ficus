@@ -3,7 +3,7 @@ package ceedubs.config.readers
 import ceedubs.config.Spec
 import com.typesafe.config.ConfigFactory
 
-class OptionConfigValueReadersSpec extends Spec with OptionConfigValueReaders with AnyValConfigValueReaders { def is =
+class OptionReadersSpec extends Spec with OptionReaders with AnyValReaders { def is =
   "An option value reader should" ^
     "wrap an existing value in a Some" ! optionSome ^
     "return a None for a non-existing value" ! optionNone
