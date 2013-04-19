@@ -8,6 +8,7 @@ import ceedubs.config.readers.ValueReader
 case class ServiceConfig(urls: Set[String], maxConnections: Int, httpsRequired: Boolean)
 
 class Examples extends Specification {
+
   // an example config snippet for us to work with
   val config = ConfigFactory.parseString(
     """
@@ -58,10 +59,10 @@ class Examples extends Specification {
       userServiceConfig.maxConnections must beEqualTo(100)
 
       val analyticsServiceConfig: ServiceConfig = servicesConfig.getAs[ServiceConfig]("analytics")
+
       // the analytics service config doesn't define an "httpsRequired" value, but the serviceConfigReader defaults
       // to false if it is empty with its 'getOrElse false' on the extracted Option
       analyticsServiceConfig.httpsRequired must beFalse
-
     }
   }
 }
