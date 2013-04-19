@@ -1,0 +1,7 @@
+.idea
+.idea_modules
+target
+*.swp
+*~
+.DS_Store
+.lib
