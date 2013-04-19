@@ -1,6 +1,6 @@
-package ceedubs.config.readers
+package ceedubs.config
+package readers
 
-import ceedubs.config.Spec
 import com.typesafe.config.ConfigFactory
 
 class CollectionReadersSpec extends Spec with CollectionReaders { def is =
