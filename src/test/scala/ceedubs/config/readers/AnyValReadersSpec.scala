@@ -12,7 +12,10 @@ class AnyValReadersSpec extends Spec with AnyValReaders { def is =
     "read an int" ! readInt ^
                             end ^
   "The Long value reader should" ^
-    "read a long" ! readLong
+    "read a long" ! readLong ^
+                             end ^
+  "The Double value reader should" ^
+    "read a double" ! readDouble
 
   def booleanReadTrue = {
     val cfg = ConfigFactory.parseString("myValue = true")
@@ -32,6 +35,11 @@ class AnyValReadersSpec extends Spec with AnyValReaders { def is =
   def readLong = {
     val cfg = ConfigFactory.parseString("myValue = 4123098334081023948")
     LongValueReader.get(cfg, "myValue") must beEqualTo(4123098334081023948L)
+  }
+
+  def readDouble = {
+    val cfg = ConfigFactory.parseString("myValue = 1.234")
+    DoubleValueReader.get(cfg, "myValue") must beEqualTo(1.234)
   }
 
 }

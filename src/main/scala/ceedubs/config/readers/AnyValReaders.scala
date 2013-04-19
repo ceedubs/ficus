@@ -14,4 +14,8 @@ trait AnyValReaders {
   implicit val LongValueReader: ValueReader[Long] = new ValueReader[Long] {
     def get(config: Config, path: String): Long = config.getLong(path)
   }
+
+  implicit val DoubleValueReader: ValueReader[Double] = new ValueReader[Double] {
+    def get(config: Config, path: String): Double = config.getDouble(path)
+  }
 }
