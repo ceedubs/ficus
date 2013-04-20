@@ -3,7 +3,7 @@ package readers
 
 import com.typesafe.config.ConfigFactory
 
-class CollectionReadersSpec extends Spec with CollectionReaders { def is =
+class CollectionReadersSpec extends Spec with CollectionReaders with AnyValReaders with StringReader { def is =
   "The list value reader should" ^
     "read a list of strings" ! readStringList ^
     "read a list of booleans" ! readBooleanList ^
@@ -20,51 +20,51 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is =
 
   def readStringList = {
     val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c"]""")
-    castingListValueReader[String].get(cfg, "myValue") must beEqualTo(List("a", "b", "c"))
+    delegatingListValueReader[String].get(cfg, "myValue") must beEqualTo(List("a", "b", "c"))
   }
 
   def readBooleanList = {
     val cfg = ConfigFactory.parseString("myValue = [true, false, true]")
-    castingListValueReader[Boolean].get(cfg, "myValue") must beEqualTo(List(true, false, true))
+    delegatingListValueReader[Boolean].get(cfg, "myValue") must beEqualTo(List(true, false, true))
   }
 
   def readIntList = {
     val cfg = ConfigFactory.parseString("myValue = [1, 2, 3]")
-    castingListValueReader[Boolean].get(cfg, "myValue") must beEqualTo(List(1, 2, 3))
+    delegatingListValueReader[Int].get(cfg, "myValue") must beEqualTo(List(1, 2, 3))
   }
 
   def readLongList = {
     val cfg = ConfigFactory.parseString("myValue = [2147483648, 2, 3]")
-    castingListValueReader[Long].get(cfg, "myValue") must beEqualTo(List(2147483648L, 2, 3))
+    delegatingListValueReader[Long].get(cfg, "myValue") must beEqualTo(List(2147483648L, 2, 3))
   }
 
   def readDoubleList = {
     val cfg = ConfigFactory.parseString("myValue = [0.1, 2.3, 3.4]")
-    castingListValueReader[Long].get(cfg, "myValue") must beEqualTo(List(0.1, 2.3, 3.4))
+    delegatingListValueReader[Double].get(cfg, "myValue") must beEqualTo(List(0.1, 2.3, 3.4))
   }
 
   def readStringSet = {
     val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c", "c"]""")
-    castingSetValueReader[String].get(cfg, "myValue") must beEqualTo(Set("a", "b", "c"))
+    delegatingSetValueReader[String].get(cfg, "myValue") must beEqualTo(Set("a", "b", "c"))
   }
 
   def readBooleanSet = {
     val cfg = ConfigFactory.parseString("myValue = [true, false, true]")
-    castingSetValueReader[Boolean].get(cfg, "myValue") must beEqualTo(Set(true, false))
+    delegatingSetValueReader[Boolean].get(cfg, "myValue") must beEqualTo(Set(true, false))
   }
 
   def readIntSet = {
     val cfg = ConfigFactory.parseString("myValue = [1, 2, 3, 3]")
-    castingSetValueReader[Int].get(cfg, "myValue") must beEqualTo(Set(1, 2, 3))
+    delegatingSetValueReader[Int].get(cfg, "myValue") must beEqualTo(Set(1, 2, 3))
   }
 
   def readLongSet = {
     val cfg = ConfigFactory.parseString("myValue = [2147483648, 2, 3]")
-    castingSetValueReader[Long].get(cfg, "myValue") must beEqualTo(Set(2147483648L, 2, 3))
+    delegatingSetValueReader[Long].get(cfg, "myValue") must beEqualTo(Set(2147483648L, 2, 3))
   }
 
   def readDoubleSet = {
     val cfg = ConfigFactory.parseString("myValue = [0.1, 2.3, 3.4]")
-    castingSetValueReader[Long].get(cfg, "myValue") must beEqualTo(Set(0.1, 2.3, 3.4))
+    delegatingSetValueReader[Double].get(cfg, "myValue") must beEqualTo(Set(0.1, 2.3, 3.4))
   }
 }
