@@ -1,13 +1,7 @@
-# config #
+# Ficus #
 Ficus is a lightweight companion to Typesafe config that makes it more Scala-friendly.
 
-It adds a `getAs[A]` method to `Config`, so you can do things like `config.getAs[Option[Int]]` or `config.getAs[List[String]]` (a Scala List instead of a silly mutable Java List!). Type classes are used so that many silly mistakes can be caught by the compiler, and they also make it easy for you to define your own types that can be extracted from config!
+Ficus adds a `getAs[A]` method to a normal [Typesafe Config](http://typesafehub.github.io/config/latest/api/com/typesafe/config/Config.html) so you can do things like `config.getAs[Option[Int]]` or `config.getAs[List[String]]`. It is implemented with type classes so that it is easily extensible and many silly mistakes can be caught by the compiler.
 
-## Build & run ##
-
-```sh
-$ cd ficus
-$ chmod u+x sbt
-$ ./sbt
-> +run
-```
+# Examples #
+For now, see [the example spec](https://github.com/ceedubs/ficus/blob/master/src/test/scala/ceedubs/ficus/Examples.scala)
