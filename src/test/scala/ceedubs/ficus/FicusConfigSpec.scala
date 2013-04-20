@@ -1,10 +1,10 @@
-package ceedubs.config
+package ceedubs.ficus
 
 import com.typesafe.config.ConfigFactory
-import KindsafeConfig.{ BooleanValueReader, toKindsafeConfig }
+import FicusConfig.{ BooleanValueReader, toFicusConfig }
 
-class KindsafeConfigSpec extends Spec { def is =
-  "A Kindsafe config should" ^
+class FicusConfigSpec extends Spec { def is =
+  "A Ficus config should" ^
     "be implicitly converted from a Typesafe config" ! implicitlyConverted
 
   def implicitlyConverted = {

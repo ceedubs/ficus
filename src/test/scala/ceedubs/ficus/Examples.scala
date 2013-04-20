@@ -1,9 +1,9 @@
-package ceedubs.config
+package ceedubs.ficus
 
 import org.specs2.mutable.Specification
 import com.typesafe.config.{Config, ConfigFactory}
-import KindsafeConfig._
-import ceedubs.config.readers.ValueReader
+import FicusConfig._
+import ceedubs.ficus.readers.ValueReader
 
 case class ServiceConfig(urls: Set[String], maxConnections: Int, httpsRequired: Boolean)
 
@@ -25,7 +25,7 @@ class Examples extends Specification {
       |}
     """.stripMargin)
 
-  "Kindsafe config" should {
+  "Ficus config" should {
     "make Typesafe config more Scala-friendly" in {
       val userServiceConfig = config.getAs[Config]("services.users")
       userServiceConfig.getAs[Set[String]]("urls") must beEqualTo(Set("localhost:8001"))

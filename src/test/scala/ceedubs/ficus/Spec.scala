@@ -1,4 +1,4 @@
-package ceedubs.config
+package ceedubs.ficus
 
 import org.specs2.specification.{FormattingFragments, FragmentsBuilder, BaseSpecification}
 import org.specs2.matcher.MustMatchers

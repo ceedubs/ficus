@@ -1,5 +1,5 @@
 /* basic project info */
-name := "config"
+name := "ficus"
 
 organization := "ceedubs"
 
@@ -7,7 +7,7 @@ version := "0.1.0-SNAPSHOT"
 
 description := "A Scala-friendly wrapper companion for Typesafe config"
 
-homepage := Some(url("https://github.com/ceedubs/config"))
+homepage := Some(url("https://github.com/ceedubs/ficus"))
 
 startYear := Some(2013)
 
@@ -17,9 +17,9 @@ licenses := Seq(
 
 scmInfo := Some(
   ScmInfo(
-    url("https://github.com/ceedubs/config"),
-    "scm:git:https://github.com/ceedubs/config.git",
-    Some("scm:git:git@github.com:ceedubs/config.git")
+    url("https://github.com/ceedubs/ficus"),
+    "scm:git:https://github.com/ceedubs/ficus.git",
+    Some("scm:git:git@github.com:ceedubs/ficus.git")
   )
 )
 
