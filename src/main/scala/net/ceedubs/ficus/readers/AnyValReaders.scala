@@ -1,4 +1,4 @@
-package ceedubs.ficus.readers
+package net.ceedubs.ficus.readers
 
 import com.typesafe.config.Config
 

@@ -1,4 +1,4 @@
-package ceedubs.ficus
+package net.ceedubs.ficus
 
 import com.typesafe.config.ConfigFactory
 import FicusConfig.{ booleanValueReader, toFicusConfig }

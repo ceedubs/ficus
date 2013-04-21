@@ -1,7 +1,7 @@
-package ceedubs.ficus.readers
+package net.ceedubs.ficus.readers
 
 import com.typesafe.config.ConfigFactory
-import ceedubs.ficus.Spec
+import net.ceedubs.ficus.Spec
 
 class AnyValReadersSpec extends Spec with AnyValReaders { def is =
   "The Boolean value reader should" ^

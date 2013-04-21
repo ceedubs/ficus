@@ -8,7 +8,7 @@ Ficus adds a `getAs[A]` method to a normal [Typesafe Config](http://typesafehub.
 # Examples #
 ```scala
 import com.typesafe.config.{Config, ConfigFactory}
-import ceedubs.ficus.FicusConfig._
+import net.ceedubs.ficus.FicusConfig._
 
 class Examples {
   val config: Config = ConfigFactory.load() // standard Typesafe Config
@@ -24,20 +24,20 @@ class Examples {
 }
 ```
 
-For more detailed examples and how they match up with what's defined in a config file, see [the example spec](https://github.com/ceedubs/ficus/blob/master/src/test/scala/ceedubs/ficus/Examples.scala).
+For more detailed examples and how they match up with what's defined in a config file, see [the example spec](https://github.com/ceedubs/ficus/blob/master/src/test/scala/net/ceedubs/ficus/Examples.scala).
 
 # Adding the dependency #
 TODO. Right now the library isn't properly published.
 
 # Imports #
-The easiest way to start using Ficus config is to just `import ceedubs.ficus.FicusConfig._` as was done in the Examples section. This will import all of the implicit values you need to start easily grabbing basic types out of config using the `getAs` method that will become available on Typesafe `Config` objects.
+The easiest way to start using Ficus config is to just `import net.ceedubs.ficus.FicusConfig._` as was done in the Examples section. This will import all of the implicit values you need to start easily grabbing basic types out of config using the `getAs` method that will become available on Typesafe `Config` objects.
 
 If you would like to be more judicial about what you import (either to prevent namespace pollution or to potentially speed up compile times), you are free to specify which imports you need.
 
-You will definitely need to `import ceedubs.ficus.FicusConfig.toFicusConfig`, which will provide an implicit conversion from Typesafe `Config` to `FicusConfig`, giving you the `getAs` method.
+You will definitely need to `import net.ceedubs.ficus.FicusConfig.toFicusConfig`, which will provide an implicit conversion from Typesafe `Config` to `FicusConfig`, giving you the `getAs` method.
 
-You will then need a [ValueReader](https://github.com/ceedubs/ficus/blob/master/src/main/scala/ceedubs/ficus/readers/ValueReader.scala) for each type that you want to grab using `getAs`. You can choose whether you would like to get the reader via an import or a mixin Trait. For example, if you want to be able to call `getAs[String]`, you can either `import ceedubs.ficus.FicusConfig.stringValueReader` or you can add `with ceedubs.ficus.readers.StringReader` to your class definition.
+You will then need a [ValueReader](https://github.com/ceedubs/ficus/blob/master/src/main/scala/net/ceedubs/ficus/readers/ValueReader.scala) for each type that you want to grab using `getAs`. You can choose whether you would like to get the reader via an import or a mixin Trait. For example, if you want to be able to call `getAs[String]`, you can either `import net.ceedubs.ficus.FicusConfig.stringValueReader` or you can add `with net.ceedubs.ficus.readers.StringReader` to your class definition.
 
-If instead you want to be able to call `getAs[Option[String]]`, you would need to bring an implicit `ValueReader` for `Option` into scope (via `import ceedubs.ficus.FicusConfig.optionValueReader` for example), but then you would also need to bring the `String` value reader into scope as described above, since the `Option` value reader delegates through to the relevant value reader after checking that a config value exists at the given path.
+If instead you want to be able to call `getAs[Option[String]]`, you would need to bring an implicit `ValueReader` for `Option` into scope (via `import net.ceedubs.ficus.FicusConfig.optionValueReader` for example), but then you would also need to bring the `String` value reader into scope as described above, since the `Option` value reader delegates through to the relevant value reader after checking that a config value exists at the given path.
 
 _Don't worry_. It will be obvious if you forgot to bring the right value reader into scope, because the compiler will give you an error.

@@ -1,7 +1,7 @@
-package ceedubs.ficus
+package net.ceedubs.ficus
 
 import com.typesafe.config.{Config, ConfigFactory}
-import ceedubs.ficus.FicusConfig._
+import net.ceedubs.ficus.FicusConfig._
 
 class Examples {
   val config: Config = ConfigFactory.load() // standard Typesafe Config

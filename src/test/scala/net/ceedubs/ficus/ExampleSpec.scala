@@ -1,9 +1,9 @@
-package ceedubs.ficus
+package net.ceedubs.ficus
 
 import org.specs2.mutable.Specification
 import com.typesafe.config.{Config, ConfigFactory}
 import FicusConfig._
-import ceedubs.ficus.readers.ValueReader
+import net.ceedubs.ficus.readers.ValueReader
 
 case class ServiceConfig(urls: Set[String], maxConnections: Int, httpsRequired: Boolean)
 
