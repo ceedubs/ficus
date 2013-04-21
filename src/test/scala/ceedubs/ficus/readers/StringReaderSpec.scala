@@ -9,6 +9,6 @@ class StringReaderSpec extends Spec with StringReader { def is =
 
   def readString = {
     val cfg = ConfigFactory.parseString("myValue = \"test\"")
-    StringValueReader.get(cfg, "myValue") must beEqualTo("test")
+    stringValueReader.get(cfg, "myValue") must beEqualTo("test")
   }
 }

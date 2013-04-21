@@ -2,7 +2,7 @@ package ceedubs.ficus.readers
 
 import com.typesafe.config.Config
 
-trait OptionReaders {
+trait OptionReader {
   implicit def optionValueReader[A](implicit ValueReader: ValueReader[A]): ValueReader[Option[A]] = new ValueReader[Option[A]] {
     def get(config: Config, path: String): Option[A] = {
       if (config.hasPath(path)) {
@@ -13,3 +13,5 @@ trait OptionReaders {
     }
   }
 }
+
+object OptionReader extends OptionReader

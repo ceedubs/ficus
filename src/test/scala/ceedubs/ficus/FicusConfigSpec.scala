@@ -1,7 +1,7 @@
 package ceedubs.ficus
 
 import com.typesafe.config.ConfigFactory
-import FicusConfig.{ BooleanValueReader, toFicusConfig }
+import FicusConfig.{ booleanValueReader, toFicusConfig }
 
 class FicusConfigSpec extends Spec { def is =
   "A Ficus config should" ^

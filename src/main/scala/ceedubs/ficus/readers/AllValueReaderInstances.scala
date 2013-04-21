@@ -1,6 +1,6 @@
 package ceedubs.ficus.readers
 
-trait AllValueReaderInstances extends AnyValReaders with StringReader with OptionReaders
+trait AllValueReaderInstances extends AnyValReaders with StringReader with OptionReader
     with CollectionReaders with ConfigReader
 
 object AllValueReaderInstances extends AllValueReaderInstances

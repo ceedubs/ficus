@@ -2,8 +2,10 @@ package ceedubs.ficus
 package readers
 
 import com.typesafe.config.ConfigFactory
+import AnyValReaders.{booleanValueReader, doubleValueReader, intValueReader, longValueReader}
+import StringReader.stringValueReader
 
-class CollectionReadersSpec extends Spec with CollectionReaders with AnyValReaders with StringReader { def is =
+class CollectionReadersSpec extends Spec with CollectionReaders { def is =
   "The list value reader should" ^
     "read a list of strings" ! readStringList ^
     "read a list of booleans" ! readBooleanList ^

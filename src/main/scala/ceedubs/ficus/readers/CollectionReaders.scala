@@ -19,3 +19,5 @@ trait CollectionReaders {
     }
   }
 }
+
+object CollectionReaders extends CollectionReaders
