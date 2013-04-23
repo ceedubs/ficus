@@ -2,7 +2,7 @@ package net.ceedubs.ficus
 package readers
 
 import com.typesafe.config.ConfigFactory
-import scala.concurrent.duration.{FiniteDuration, MILLISECONDS, MINUTES}
+import scala.concurrent.duration._
 
 class DurationReadersSpec extends Spec with DurationReaders { def is =
   "The finite duration reader should" ^
@@ -11,12 +11,12 @@ class DurationReadersSpec extends Spec with DurationReaders { def is =
 
   def readMillis = {
     val cfg = ConfigFactory.parseString("myValue = 15")
-    finiteDurationReader.get(cfg, "myValue") must beEqualTo(FiniteDuration(15, MILLISECONDS))
+    finiteDurationReader.get(cfg, "myValue") must beEqualTo(15 millis)
   }
 
   def readMinute = {
     val cfg = ConfigFactory.parseString("myValue = \"15 minutes\"")
-    finiteDurationReader.get(cfg, "myValue") must beEqualTo(FiniteDuration(15, MINUTES))
+    finiteDurationReader.get(cfg, "myValue") must beEqualTo(15 minutes)
   }
 
 }
