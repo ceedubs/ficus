@@ -3,8 +3,6 @@ name := "ficus"
 
 organization := "net.ceedubs"
 
-version := "0.1.0-SNAPSHOT"
-
 description := "A Scala-friendly wrapper companion for Typesafe config"
 
 homepage := Some(url("https://github.com/ceedubs/ficus"))
