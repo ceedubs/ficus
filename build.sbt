@@ -1,7 +1,7 @@
 /* basic project info */
 name := "ficus"
 
-organization := "ceedubs"
+organization := "net.ceedubs"
 
 version := "0.1.0-SNAPSHOT"
 
