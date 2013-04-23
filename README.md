@@ -27,7 +27,11 @@ class Examples {
 For more detailed examples and how they match up with what's defined in a config file, see [the example spec](https://github.com/ceedubs/ficus/blob/master/src/test/scala/net/ceedubs/ficus/Examples.scala).
 
 # Adding the dependency #
-TODO. Right now the library isn't properly published.
+Add the following to your SBT build file (most likely build.sbt or project/build.scala):
+```scala
+libraryDependencies += "net.ceedubs" %% "ficus" % "0.1.0"
+```
+Currently Ficus is cross-built against Scala 2.10.x. If you would like it to be cross-built against an older version of Scala, create a GitHub issue, and I will most likely be able to do that.
 
 # Imports #
 The easiest way to start using Ficus config is to just `import net.ceedubs.ficus.FicusConfig._` as was done in the Examples section. This will import all of the implicit values you need to start easily grabbing basic types out of config using the `getAs` method that will become available on Typesafe `Config` objects.
