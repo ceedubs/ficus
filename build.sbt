@@ -57,11 +57,6 @@ scalacOptions <++= scalaVersion map { sv =>
 
 javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 
-/* entry point */
-mainClass in (Compile, packageBin) := Some("ceedubs.config.Main")
-
-mainClass in (Compile, run) := Some("ceedubs.config.Main")
-
 /* dependencies */
 libraryDependencies ++= Seq (
   "org.specs2"   %% "specs2" % "1.15-SNAPSHOT" % "test",
