@@ -18,6 +18,15 @@ trait CollectionReaders {
       }
     }
   }
+
+  implicit def delegatingMapValueReader[A](implicit entryReader: ValueReader[A]): ValueReader[Map[String, A]] = new ValueReader[Map[String, A]] {
+    def get(config: Config, path: String): Map[String, A] = {
+      config.getConfig(path).root().entrySet().asScala map { entry =>
+        val key = entry.getKey
+        key -> entryReader.get(config, s"$path.$key")
+      } toMap
+    }
+  }
 }
 
 object CollectionReaders extends CollectionReaders

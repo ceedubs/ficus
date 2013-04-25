@@ -63,6 +63,9 @@ class ExampleSpec extends Specification {
       // the analytics service config doesn't define an "httpsRequired" value, but the serviceConfigReader defaults
       // to false if it is empty with its 'getOrElse false' on the extracted Option
       analyticsServiceConfig.httpsRequired must beFalse
+
+      val servicesMap = config.getAs[Map[String,ServiceConfig]]("services")
+      servicesMap must beEqualTo(Map("users" -> userServiceConfig, "analytics" -> analyticsServiceConfig))
     }
   }
 }
