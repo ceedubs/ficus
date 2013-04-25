@@ -24,7 +24,7 @@ class Examples {
 }
 ```
 
-For more detailed examples and how they match up with what's defined in a config file, see [the example spec](https://github.com/ceedubs/ficus/blob/master/src/test/scala/net/ceedubs/ficus/Examples.scala).
+For more detailed examples and how they match up with what's defined in a config file, see [the example spec](https://github.com/ceedubs/ficus/blob/master/src/test/scala/net/ceedubs/ficus/ExampleSpec.scala).
 
 # Adding the dependency #
 Add the following to your SBT build file (most likely build.sbt or project/build.scala):
