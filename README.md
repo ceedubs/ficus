@@ -33,6 +33,17 @@ libraryDependencies += "net.ceedubs" %% "ficus" % "0.1.2"
 ```
 Currently Ficus is cross-built against Scala 2.10.x. If you would like it to be cross-built against an older version of Scala, create a GitHub issue, and I will most likely be able to do that.
 
+# Built-in readers #
+Out of the box, Ficus can read quite a few types from config:
+ * Primitives (`Boolean`, `Int`, `Long`, `Double`)
+ * `String`
+ * `Option[A]`
+ * Collections (`List[A]`, `Set[A]`, `Map[String, A]`)
+ * `Config` (Typesafe config)
+ * `FiniteDuration`
+
+In this context, `A` means any type for which a `ValueReader` is already defined. For example, `Option[String]` is supported out of the box because `String` is. If you want to be able to extract an `Option[Foo]`, the option part is taken care of, but you will need to provide the implementation for extracting a Foo from config. See [Extracting a custom type](#extracting-a-custom-type).
+
 # Imports #
 The easiest way to start using Ficus config is to just `import net.ceedubs.ficus.FicusConfig._` as was done in the Examples section. This will import all of the implicit values you need to start easily grabbing basic types out of config using the `getAs` method that will become available on Typesafe `Config` objects.
 
