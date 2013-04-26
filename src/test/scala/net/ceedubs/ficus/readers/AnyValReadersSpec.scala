@@ -19,27 +19,27 @@ class AnyValReadersSpec extends Spec with AnyValReaders { def is =
 
   def booleanReadTrue = {
     val cfg = ConfigFactory.parseString("myValue = true")
-    booleanValueReader.get(cfg, "myValue") must beTrue
+    booleanValueReader.read(cfg, "myValue") must beTrue
   }
 
   def booleanReadFalse = {
     val cfg = ConfigFactory.parseString("myValue = false")
-    booleanValueReader.get(cfg, "myValue") must beFalse
+    booleanValueReader.read(cfg, "myValue") must beFalse
   }
 
   def readInt = {
     val cfg = ConfigFactory.parseString("myValue = 4")
-    intValueReader.get(cfg, "myValue") must beEqualTo(4)
+    intValueReader.read(cfg, "myValue") must beEqualTo(4)
   }
 
   def readLong = {
     val cfg = ConfigFactory.parseString("myValue = 4123098334081023948")
-    longValueReader.get(cfg, "myValue") must beEqualTo(4123098334081023948L)
+    longValueReader.read(cfg, "myValue") must beEqualTo(4123098334081023948L)
   }
 
   def readDouble = {
     val cfg = ConfigFactory.parseString("myValue = 1.234")
-    doubleValueReader.get(cfg, "myValue") must beEqualTo(1.234)
+    doubleValueReader.read(cfg, "myValue") must beEqualTo(1.234)
   }
 
 }

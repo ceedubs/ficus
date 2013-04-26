@@ -12,7 +12,7 @@ trait DurationReaders {
    * For example, it can read "15 minutes" or "1 day".
    */
   implicit def finiteDurationReader: ValueReader[FiniteDuration] = new ValueReader[FiniteDuration] {
-    def get(config: Config, path: String): FiniteDuration = {
+    def read(config: Config, path: String): FiniteDuration = {
       val millis = config.getMilliseconds(path)
       FiniteDuration(millis, MILLISECONDS)
     }

@@ -11,12 +11,12 @@ class DurationReadersSpec extends Spec with DurationReaders { def is =
 
   def readMillis = {
     val cfg = ConfigFactory.parseString("myValue = 15")
-    finiteDurationReader.get(cfg, "myValue") must beEqualTo(15 millis)
+    finiteDurationReader.read(cfg, "myValue") must beEqualTo(15 millis)
   }
 
   def readMinute = {
     val cfg = ConfigFactory.parseString("myValue = \"15 minutes\"")
-    finiteDurationReader.get(cfg, "myValue") must beEqualTo(15 minutes)
+    finiteDurationReader.read(cfg, "myValue") must beEqualTo(15 minutes)
   }
 
 }

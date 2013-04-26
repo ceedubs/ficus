@@ -9,6 +9,6 @@ class FicusConfigSpec extends Spec { def is =
 
   def implicitlyConverted = {
     val cfg = ConfigFactory.parseString("myValue = true")
-    cfg.getAs[Boolean]("myValue") must beTrue
+    cfg.as[Boolean]("myValue") must beTrue
   }
 }

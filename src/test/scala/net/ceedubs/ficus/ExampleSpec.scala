@@ -27,44 +27,44 @@ class ExampleSpec extends Specification {
 
   "Ficus config" should {
     "make Typesafe config more Scala-friendly" in {
-      val userServiceConfig = config.getAs[Config]("services.users")
-      userServiceConfig.getAs[Set[String]]("urls") must beEqualTo(Set("localhost:8001"))
-      userServiceConfig.getAs[Int]("maxConnections") must beEqualTo(100)
-      userServiceConfig.getAs[Option[Boolean]]("httpsRequired") must beSome(true)
+      val userServiceConfig = config.as[Config]("services.users")
+      userServiceConfig.as[Set[String]]("urls") must beEqualTo(Set("localhost:8001"))
+      userServiceConfig.as[Int]("maxConnections") must beEqualTo(100)
+      userServiceConfig.as[Option[Boolean]]("httpsRequired") must beSome(true)
 
-      val analyticsServiceConfig = config.getAs[Config]("services.analytics")
-      analyticsServiceConfig.getAs[List[String]]("urls") must beEqualTo(List("localhost:8002", "localhost:8003"))
-      val analyticsServiceRequiresHttps = analyticsServiceConfig.getAs[Option[Boolean]]("httpsRequired") getOrElse false
+      val analyticsServiceConfig = config.as[Config]("services.analytics")
+      analyticsServiceConfig.as[List[String]]("urls") must beEqualTo(List("localhost:8002", "localhost:8003"))
+      val analyticsServiceRequiresHttps = analyticsServiceConfig.as[Option[Boolean]]("httpsRequired") getOrElse false
       analyticsServiceRequiresHttps must beFalse
     }
 
     "Be easily extensible" in {
       // need to define an implicit ValueReader[ServiceConfig] to be able to extract a ServiceConfig
-      // if we try to call getAs[ServiceConfig] without one, the compiler will give you an error
+      // if we try to call as[ServiceConfig] without one, the compiler will give you an error
       implicit val serviceConfigReader: ValueReader[ServiceConfig] = new ValueReader[ServiceConfig] {
-        def get(config: Config, path: String): ServiceConfig = {
-          val serviceConfig = config.getAs[Config](path)
+        def read(config: Config, path: String): ServiceConfig = {
+          val serviceConfig = config.as[Config](path)
           ServiceConfig(
-            urls = serviceConfig.getAs[Set[String]]("urls"),
+            urls = serviceConfig.as[Set[String]]("urls"),
             maxConnections = serviceConfig.getInt("maxConnections"), // the old-fashioned way is fine too!
-            httpsRequired = serviceConfig.getAs[Option[Boolean]]("httpsRequired") getOrElse false
+            httpsRequired = serviceConfig.as[Option[Boolean]]("httpsRequired") getOrElse false
           )
         }
       }
 
       // so we don't have to add a "services." prefix for each service
-      val servicesConfig = config.getAs[Config]("services")
+      val servicesConfig = config.as[Config]("services")
 
-      val userServiceConfig: ServiceConfig = servicesConfig.getAs[ServiceConfig]("users")
+      val userServiceConfig: ServiceConfig = servicesConfig.as[ServiceConfig]("users")
       userServiceConfig.maxConnections must beEqualTo(100)
 
-      val analyticsServiceConfig: ServiceConfig = servicesConfig.getAs[ServiceConfig]("analytics")
+      val analyticsServiceConfig: ServiceConfig = servicesConfig.as[ServiceConfig]("analytics")
 
       // the analytics service config doesn't define an "httpsRequired" value, but the serviceConfigReader defaults
       // to false if it is empty with its 'getOrElse false' on the extracted Option
       analyticsServiceConfig.httpsRequired must beFalse
 
-      val servicesMap = config.getAs[Map[String,ServiceConfig]]("services")
+      val servicesMap = config.as[Map[String,ServiceConfig]]("services")
       servicesMap must beEqualTo(Map("users" -> userServiceConfig, "analytics" -> analyticsServiceConfig))
     }
   }

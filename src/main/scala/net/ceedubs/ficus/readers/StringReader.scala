@@ -4,7 +4,7 @@ import com.typesafe.config.Config
 
 trait StringReader {
   implicit val stringValueReader: ValueReader[String] = new ValueReader[String] {
-    def get(config: Config, path: String): String = config.getString(path)
+    def read(config: Config, path: String): String = config.getString(path)
   }
 }
 

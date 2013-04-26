@@ -29,52 +29,52 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is =
 
   def readStringList = {
     val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c"]""")
-    delegatingListValueReader[String].get(cfg, "myValue") must beEqualTo(List("a", "b", "c"))
+    delegatingListValueReader[String].read(cfg, "myValue") must beEqualTo(List("a", "b", "c"))
   }
 
   def readBooleanList = {
     val cfg = ConfigFactory.parseString("myValue = [true, false, true]")
-    delegatingListValueReader[Boolean].get(cfg, "myValue") must beEqualTo(List(true, false, true))
+    delegatingListValueReader[Boolean].read(cfg, "myValue") must beEqualTo(List(true, false, true))
   }
 
   def readIntList = {
     val cfg = ConfigFactory.parseString("myValue = [1, 2, 3]")
-    delegatingListValueReader[Int].get(cfg, "myValue") must beEqualTo(List(1, 2, 3))
+    delegatingListValueReader[Int].read(cfg, "myValue") must beEqualTo(List(1, 2, 3))
   }
 
   def readLongList = {
     val cfg = ConfigFactory.parseString("myValue = [2147483648, 2, 3]")
-    delegatingListValueReader[Long].get(cfg, "myValue") must beEqualTo(List(2147483648L, 2, 3))
+    delegatingListValueReader[Long].read(cfg, "myValue") must beEqualTo(List(2147483648L, 2, 3))
   }
 
   def readDoubleList = {
     val cfg = ConfigFactory.parseString("myValue = [0.1, 2.3, 3.4]")
-    delegatingListValueReader[Double].get(cfg, "myValue") must beEqualTo(List(0.1, 2.3, 3.4))
+    delegatingListValueReader[Double].read(cfg, "myValue") must beEqualTo(List(0.1, 2.3, 3.4))
   }
 
   def readStringSet = {
     val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c", "c"]""")
-    delegatingSetValueReader[String].get(cfg, "myValue") must beEqualTo(Set("a", "b", "c"))
+    delegatingSetValueReader[String].read(cfg, "myValue") must beEqualTo(Set("a", "b", "c"))
   }
 
   def readBooleanSet = {
     val cfg = ConfigFactory.parseString("myValue = [true, false, true]")
-    delegatingSetValueReader[Boolean].get(cfg, "myValue") must beEqualTo(Set(true, false))
+    delegatingSetValueReader[Boolean].read(cfg, "myValue") must beEqualTo(Set(true, false))
   }
 
   def readIntSet = {
     val cfg = ConfigFactory.parseString("myValue = [1, 2, 3, 3]")
-    delegatingSetValueReader[Int].get(cfg, "myValue") must beEqualTo(Set(1, 2, 3))
+    delegatingSetValueReader[Int].read(cfg, "myValue") must beEqualTo(Set(1, 2, 3))
   }
 
   def readLongSet = {
     val cfg = ConfigFactory.parseString("myValue = [2147483648, 2, 3]")
-    delegatingSetValueReader[Long].get(cfg, "myValue") must beEqualTo(Set(2147483648L, 2, 3))
+    delegatingSetValueReader[Long].read(cfg, "myValue") must beEqualTo(Set(2147483648L, 2, 3))
   }
 
   def readDoubleSet = {
     val cfg = ConfigFactory.parseString("myValue = [0.1, 2.3, 3.4]")
-    delegatingSetValueReader[Double].get(cfg, "myValue") must beEqualTo(Set(0.1, 2.3, 3.4))
+    delegatingSetValueReader[Double].read(cfg, "myValue") must beEqualTo(Set(0.1, 2.3, 3.4))
   }
 
   def readStringStringMap = {
@@ -85,7 +85,7 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is =
         |  item2 = "value2"
         |}
       """.stripMargin)
-    delegatingMapValueReader[String].get(cfg, "myValue") must beEqualTo(Map("item1" -> "value1", "item2" -> "value2"))
+    delegatingMapValueReader[String].read(cfg, "myValue") must beEqualTo(Map("item1" -> "value1", "item2" -> "value2"))
   }
 
   def readStringBooleanMap = {
@@ -96,7 +96,7 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is =
         |  item2 = false
         |}
       """.stripMargin)
-    delegatingMapValueReader[Boolean].get(cfg, "myValue") must beEqualTo(Map("item1" -> true, "item2" -> false))
+    delegatingMapValueReader[Boolean].read(cfg, "myValue") must beEqualTo(Map("item1" -> true, "item2" -> false))
   }
 
   def readStringIntMap = {
@@ -107,7 +107,7 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is =
         |  item2 = 2
         |}
       """.stripMargin)
-    delegatingMapValueReader[Int].get(cfg, "myValue") must beEqualTo(Map("item1" -> 0, "item2" -> 2))
+    delegatingMapValueReader[Int].read(cfg, "myValue") must beEqualTo(Map("item1" -> 0, "item2" -> 2))
   }
 
   def readStringLongMap = {
@@ -118,7 +118,7 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is =
         |  item2 = 2147483648
         |}
       """.stripMargin)
-    delegatingMapValueReader[Long].get(cfg, "myValue") must beEqualTo(Map("item1" -> 0L, "item2" -> 2147483648L))
+    delegatingMapValueReader[Long].read(cfg, "myValue") must beEqualTo(Map("item1" -> 0L, "item2" -> 2147483648L))
   }
 
   def readStringDoubleMap = {
@@ -131,7 +131,7 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is =
         |  }
         |}
       """.stripMargin)
-    delegatingMapValueReader[Double].get(cfg, "context.myValue") must beEqualTo(Map("item1" -> 0.0, "item2" -> 1.03))
+    delegatingMapValueReader[Double].read(cfg, "context.myValue") must beEqualTo(Map("item1" -> 0.0, "item2" -> 1.03))
   }
 
 }

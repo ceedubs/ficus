@@ -10,11 +10,11 @@ class OptionReadersSpec extends Spec with OptionReader with AnyValReaders { def 
 
   def optionSome = {
     val cfg = ConfigFactory.parseString("myValue = true")
-    optionValueReader[Boolean].get(cfg, "myValue") must beSome(true)
+    optionValueReader[Boolean].read(cfg, "myValue") must beSome(true)
   }
 
   def optionNone = {
     val cfg = ConfigFactory.parseString("")
-    optionValueReader[Boolean].get(cfg, "myValue") must beNone
+    optionValueReader[Boolean].read(cfg, "myValue") must beNone
   }
 }

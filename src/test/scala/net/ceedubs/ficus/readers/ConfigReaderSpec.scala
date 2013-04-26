@@ -14,6 +14,6 @@ class ConfigReaderSpec extends Spec with ConfigReader with AnyValReaders { def i
         |  myValue = true
         |}
       """.stripMargin)
-    configValueReader.get(cfg, "myConfig").getBoolean("myValue") must beTrue
+    configValueReader.read(cfg, "myConfig").getBoolean("myValue") must beTrue
   }
 }
