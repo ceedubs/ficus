@@ -29,7 +29,7 @@ For more detailed examples and how they match up with what's defined in a config
 # Adding the dependency #
 Add the following to your SBT build file (most likely build.sbt or project/build.scala):
 ```scala
-libraryDependencies += "net.ceedubs" %% "ficus" % "0.2.0"
+libraryDependencies += "net.ceedubs" %% "ficus" % "0.2.1"
 ```
 Currently Ficus is cross-built against Scala 2.10.x. If you would like it to be cross-built against an older version of Scala, create a GitHub issue, and I will most likely be able to do that.
 
