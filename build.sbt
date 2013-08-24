@@ -22,10 +22,10 @@ scmInfo := Some(
 )
 
 /* scala versions and options */
-scalaVersion := "2.10.1"
+scalaVersion := "2.10.2"
 
 crossScalaVersions := Seq(
-  "2.10.0"
+  "2.10.0", "2.10.1"
 )
 
 // These options will be used for *all* versions.
