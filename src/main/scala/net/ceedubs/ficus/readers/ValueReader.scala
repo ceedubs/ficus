@@ -11,7 +11,10 @@ trait ValueReader[A] {
 
 object ValueReader {
 
-  /** ValueReader that receives a Config whose root is the path being read
+  /** ValueReader that receives a Config whose root is the path being read.
+    *
+    * This is generally the most concise way to implement a ValueReader that doesn't depend on the path of the value
+    * being read.
     *
     * For example to read a `case class FooBar(foo: Foo, bar: Bar)`, instead of
     * {{{
