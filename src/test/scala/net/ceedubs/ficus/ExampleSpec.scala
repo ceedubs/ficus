@@ -41,15 +41,12 @@ class ExampleSpec extends Specification {
     "Be easily extensible" in {
       // need to define an implicit ValueReader[ServiceConfig] to be able to extract a ServiceConfig
       // if we try to call as[ServiceConfig] without one, the compiler will give you an error
-      implicit val serviceConfigReader: ValueReader[ServiceConfig] = new ValueReader[ServiceConfig] {
-        def read(config: Config, path: String): ServiceConfig = {
-          val serviceConfig = config.as[Config](path)
-          ServiceConfig(
-            urls = serviceConfig.as[Set[String]]("urls"),
-            maxConnections = serviceConfig.getInt("maxConnections"), // the old-fashioned way is fine too!
-            httpsRequired = serviceConfig.as[Option[Boolean]]("httpsRequired") getOrElse false
-          )
-        }
+      implicit val serviceConfigReader: ValueReader[ServiceConfig] = ValueReader.localized { serviceConfig =>
+        ServiceConfig(
+          urls = serviceConfig.as[Set[String]]("urls"),
+          maxConnections = serviceConfig.getInt("maxConnections"), // the old-fashioned way is fine too!
+          httpsRequired = serviceConfig.as[Option[Boolean]]("httpsRequired") getOrElse false
+        )
       }
 
       // so we don't have to add a "services." prefix for each service
