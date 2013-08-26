@@ -29,14 +29,14 @@ object ValueReader {
     * }}}
     * you could do
     * {{{
-    * ValueReader.localized[FooBar] { config =>
+    * ValueReader.relative[FooBar] { config =>
     *   FooBar(
     *     foo = config.as[Foo]("foo"),
     *     bar = config.as[Bar]("bar))
     * }
     * }}}
     */
-  def localized[A](f: Config => A): ValueReader[A] = new ValueReader[A] {
+  def relative[A](f: Config => A): ValueReader[A] = new ValueReader[A] {
     def read(config: Config, path: String): A = f(config.getConfig(path))
   }
 }
