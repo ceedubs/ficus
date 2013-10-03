@@ -8,6 +8,8 @@ trait FicusConfig {
 
   def as[A](path: String)(implicit reader: ValueReader[A]): A = reader.read(config, path)
 
+  def getAs[A](path: String)(implicit reader: ValueReader[Option[A]]) = reader.read(config, path)
+
   def apply[A](key: ConfigKey[A])(implicit reader: ValueReader[A]): A = as[A](key.path)
 }
 
