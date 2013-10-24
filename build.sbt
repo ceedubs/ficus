@@ -38,7 +38,8 @@ scalacOptions ++= Seq(
 
 scalacOptions ++= Seq(
   "-Yclosure-elim",
-  "-Yinline"
+  "-Yinline",
+  "-Xlog-implicits" // TODO remove
 )
 
 // These language flags will be used only for 2.10.x.
@@ -58,10 +59,12 @@ scalacOptions <++= scalaVersion map { sv =>
 javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 
 /* dependencies */
-libraryDependencies ++= Seq (
-  "org.specs2"   %% "specs2" % "1.15-SNAPSHOT" % "test",
-  "com.typesafe" %  "config" % "1.0.0"
-)
+libraryDependencies <++= scalaVersion { sv =>
+  Seq(
+    "org.specs2"     %% "specs2" % "1.15-SNAPSHOT" % "test",
+    "com.typesafe"   %  "config" % "1.0.0",
+    "org.scala-lang" % "scala-compiler" % sv)
+}
 
 /* you may need these repos */
 resolvers ++= Seq(
