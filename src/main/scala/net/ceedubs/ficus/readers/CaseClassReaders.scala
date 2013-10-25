@@ -2,17 +2,31 @@ package net.ceedubs.ficus
 package readers
 
 import scala.language.experimental.macros
+import com.typesafe.config.Config
 
-object CaseClassReaders {
-
+trait CaseClassReader {
+  implicit def caseClassValueReader[T <: Product]: ValueReader[T] = macro CaseClassReaderMacros.caseClassValueReader[T]
 }
+
+object CaseClassReader extends CaseClassReader
 
 object CaseClassReaderMacros extends ReflectionUtils {
   import scala.reflect.macros.Context
 
-  def hydrateTheCaseClass[T <: Product](config: FicusConfig, path: String) = macro hydrateCaseClass[T]
+  def caseClassValueReader[T <: Product : c.WeakTypeTag](c: Context): c.Expr[ValueReader[T]] = {
+    import c.universe._
 
-  def hydrateCaseClass[T <: Product : c.WeakTypeTag](c: Context)(config: c.Expr[FicusConfig], path: c.Expr[String]): c.Expr[T] = {
+    reify {
+      new ValueReader[T] {
+        def read(config: Config, path: String): T = hydrateCaseClassImpl[T](c)(
+          config = c.Expr[Config](Ident(newTermName("config"))),
+          path = c.Expr[String](Ident(newTermName("path")))).splice
+      }
+    }
+  }
+
+  // TODO should look for default values and fall back to them
+  def hydrateCaseClassImpl[T <: Product : c.WeakTypeTag](c: Context)(config: c.Expr[Config], path: c.Expr[String]): c.Expr[T] = {
     import c.universe._
 
     if (!weakTypeOf[T].typeSymbol.asClass.isCaseClass) {
@@ -36,12 +50,10 @@ object CaseClassReaderMacros extends ReflectionUtils {
     }
   }
 
-  def readConfigValue[T: c.universe.WeakTypeTag](c: Context)(config: c.Expr[FicusConfig], path: c.Expr[String], reader: c.Tree): c.Expr[T] = {
+  def readConfigValue[T: c.universe.WeakTypeTag](c: Context)(config: c.Expr[Config], path: c.Expr[String], reader: c.Tree): c.Expr[T] = {
     import c.universe._
-      val configAs = Select(config.tree, newTermName("as"))
-      val applied = Apply(configAs, List(path.tree))
-      val appliedWithImplicit = Apply(applied, List(reader))
-      c.Expr[T](appliedWithImplicit)
+    val readerRead = Select(reader, newTermName("read"))
+    c.Expr[T](Apply(readerRead, List(config.tree, path.tree)))
   }
 }
 

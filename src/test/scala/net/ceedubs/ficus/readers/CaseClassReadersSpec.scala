@@ -2,15 +2,35 @@ package net.ceedubs.ficus
 package readers
 
 import com.typesafe.config.ConfigFactory
+import net.ceedubs.ficus.FicusConfig._
 
-case class Foo(myValue: Boolean)
+case class Foo(bool: Boolean, intOpt: Option[Int], bar: Bar)
+case class Bar(string: String)
 
-class CaseClassReadersSpec extends Spec with AnyValReaders { def is =
+class CaseClassReadersSpec extends Spec { def is =
   "A case class reader should" ^
-    "hydrate a case class" ! hydrateCaseClass
+    "hydrate a case class" ! hydrateCaseClass ^
+    "be able to be used implicitly" ! useImplicitly
+
+  val testConf = ConfigFactory.parseString(
+    """
+      |foo {
+      |  bool = true
+      |  intOpt = 3
+      |  bar = {
+      |    string = "bar"
+      |  }
+      |}
+      |
+    """.stripMargin)
+
+  val expected = Foo(bool = true, intOpt = Some(3), bar = Bar("bar"))
 
   def hydrateCaseClass = {
-    val cfg = ConfigFactory.parseString("foo { myValue = true }")
-    CaseClassReaderMacros.hydrateTheCaseClass[Foo](cfg, "foo") must_== Foo(true)
+    caseClassValueReader[Foo].read(testConf, "foo") must_== expected
+  }
+
+  def useImplicitly = {
+    testConf.as[Foo]("foo") must_== expected
   }
 }
