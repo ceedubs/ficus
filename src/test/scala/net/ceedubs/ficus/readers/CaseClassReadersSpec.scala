@@ -4,8 +4,9 @@ package readers
 import com.typesafe.config.ConfigFactory
 import net.ceedubs.ficus.FicusConfig._
 
-case class Foo(bool: Boolean, intOpt: Option[Int], bar: Bar)
-case class Bar(string: String)
+case class Foo(bool: Boolean, intOpt: Option[Int], bar: Bar, baz: Baz)
+case class Bar(string: String) extends AnyVal
+case class Baz(int: Int) extends AnyVal
 
 class CaseClassReadersSpec extends Spec { def is =
   "A case class reader should" ^
@@ -17,14 +18,17 @@ class CaseClassReadersSpec extends Spec { def is =
       |foo {
       |  bool = true
       |  intOpt = 3
-      |  bar = {
+      |  bar {
       |    string = "bar"
+      |  }
+      |  baz {
+      |    int = 5
       |  }
       |}
       |
     """.stripMargin)
 
-  val expected = Foo(bool = true, intOpt = Some(3), bar = Bar("bar"))
+  val expected = Foo(bool = true, intOpt = Some(3), bar = Bar("bar"), baz = Baz(5))
 
   def hydrateCaseClass = {
     caseClassValueReader[Foo].read(testConf, "foo") must_== expected
