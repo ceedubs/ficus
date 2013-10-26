@@ -4,14 +4,17 @@ package readers
 import com.typesafe.config.ConfigFactory
 import net.ceedubs.ficus.FicusConfig._
 
-case class SimpleCaseClass(bool: Boolean)
-case class MultipleFields(string: String, long: Long)
-case class WithOption(option: Option[String])
-case class WithNestedCaseClass(simple: SimpleCaseClass)
-case class ValueClass(int: Int) extends AnyVal
-case class WithNestedValueClass(valueClass: ValueClass)
-case class Foo(bool: Boolean, intOpt: Option[Int], withNestedCaseClass: WithNestedCaseClass,
-               withNestedValueClass: WithNestedValueClass)
+object CaseClassReadersSpec {
+  case class SimpleCaseClass(bool: Boolean)
+  case class MultipleFields(string: String, long: Long)
+  case class WithOption(option: Option[String])
+  case class WithNestedCaseClass(simple: SimpleCaseClass)
+  case class ValueClass(int: Int) extends AnyVal
+  case class WithNestedValueClass(valueClass: ValueClass)
+  case class WithDefault(string: String = "bar")
+  case class Foo(bool: Boolean, intOpt: Option[Int], withNestedCaseClass: WithNestedCaseClass,
+                 withNestedValueClass: WithNestedValueClass)
+}
 
 class CaseClassReadersSpec extends Spec { def is =
   "A case class reader should" ^
@@ -22,7 +25,10 @@ class CaseClassReadersSpec extends Spec { def is =
     "read a nested case class" ! withNestedCaseClass ^
     "read a top-level value class" ! topLevelValueClass ^
     "read a nested value class" ! nestedValueClass ^
+    "fall back to a default value" ! fallbackToDefault ^
     "do a combination of these things" ! combination
+
+  import CaseClassReadersSpec._
 
   def useImplicitly = {
     val cfg = ConfigFactory.parseString("simple { bool = false }")
@@ -79,6 +85,11 @@ class CaseClassReadersSpec extends Spec { def is =
       """.stripMargin)
     caseClassValueReader[WithNestedValueClass].read(cfg, "withNestedValueClass") must_== WithNestedValueClass(
       valueClass = ValueClass(int = 5))
+  }
+
+  def fallbackToDefault = {
+    val cfg = ConfigFactory.parseString("""withDefault { }""")
+    caseClassValueReader[WithDefault].read(cfg, "withDefault") must_== WithDefault()
   }
 
   def combination = {
