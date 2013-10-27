@@ -29,8 +29,15 @@ object CompanionApplyReaderMacros {
     import c.universe._
 
     val tpe = weakTypeOf[T]
-    val applySymbol = tpe.typeSymbol.companionSymbol.typeSignature.member(newTermName("apply"))
-    val applyMethod = applySymbol.asMethod
+    val companionSymbol = tpe.typeSymbol.companionSymbol match {
+      case NoSymbol => c.abort(c.enclosingPosition, s"Cannot generate a config value reader for type $tpe, because it does not have a companion object with an apply method")
+      case x => x
+    }
+    val applyMethod = companionSymbol.typeSignature.member(newTermName("apply")) match {
+      case NoSymbol => c.abort(c.enclosingPosition, s"Cannot generate a config value reader for type $tpe, because its companion object does not have an apply method")
+      case x: TermSymbol if x.isOverloaded => c.abort(c.enclosingPosition, s"Cannot generate a config value reader for type $tpe, because the apply method in its companion object is overloaded")
+      case x: MethodSymbol => x
+    }
     val applyArgs = applyMethod.paramss.head.zipWithIndex map { case (param, index) =>
       val name = param.name.decoded
       val nameExpr = c.literal(name)
