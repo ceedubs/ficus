@@ -42,8 +42,7 @@ scalacOptions ++= Seq(
 
 scalacOptions ++= Seq(
   "-Yclosure-elim",
-  "-Yinline",
-  "-Xlog-implicits" // TODO remove
+  "-Yinline"
 )
 
 // These language flags will be used only for 2.10.x.
