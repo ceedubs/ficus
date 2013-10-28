@@ -5,7 +5,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import FicusConfig._
 import net.ceedubs.ficus.readers.ValueReader
 
-case class ServiceConfig(urls: Set[String], maxConnections: Int, httpsRequired: Boolean)
+case class ServiceConfig(urls: Set[String], maxConnections: Int, httpsRequired: Boolean = false)
 
 class ExampleSpec extends Specification {
 
@@ -38,28 +38,34 @@ class ExampleSpec extends Specification {
       analyticsServiceRequiresHttps must beFalse
     }
 
+    "Automagically be able to hydrate arbitrary types from config" in {
+      // Tkere are a few restrictions on types that can be read. See README file in root of project
+      val analyticsConfig = config.as[ServiceConfig]("services.analytics")
+      analyticsConfig.maxConnections must beEqualTo(25)
+      // since this value isn't in the config, it will fall back to the default for the case class
+      analyticsConfig.httpsRequired must beFalse
+    }
+
     "Be easily extensible" in {
-      // need to define an implicit ValueReader[ServiceConfig] to be able to extract a ServiceConfig
-      // if we try to call as[ServiceConfig] without one, the compiler will give you an error
+      // If we want a value reader that defaults httpsRequired to true instead of false (the default on the case
+      // class) we can define a custom value reader for ServiceConfig
       implicit val serviceConfigReader: ValueReader[ServiceConfig] = ValueReader.relative { serviceConfig =>
         ServiceConfig(
           urls = serviceConfig.as[Set[String]]("urls"),
           maxConnections = serviceConfig.getInt("maxConnections"), // the old-fashioned way is fine too!
-          httpsRequired = serviceConfig.as[Option[Boolean]]("httpsRequired") getOrElse false
+          httpsRequired = serviceConfig.as[Option[Boolean]]("httpsRequired") getOrElse true
         )
       }
 
       // so we don't have to add a "services." prefix for each service
       val servicesConfig = config.as[Config]("services")
 
-      val userServiceConfig: ServiceConfig = servicesConfig.as[ServiceConfig]("users")
-      userServiceConfig.maxConnections must beEqualTo(100)
-
       val analyticsServiceConfig: ServiceConfig = servicesConfig.as[ServiceConfig]("analytics")
-
       // the analytics service config doesn't define an "httpsRequired" value, but the serviceConfigReader defaults
-      // to false if it is empty with its 'getOrElse false' on the extracted Option
-      analyticsServiceConfig.httpsRequired must beFalse
+      // to true if it is empty with its 'getOrElse true' on the extracted Option
+      analyticsServiceConfig.httpsRequired must beTrue
+
+      val userServiceConfig: ServiceConfig = servicesConfig.as[ServiceConfig]("users")
 
       val servicesMap = config.as[Map[String,ServiceConfig]]("services")
       servicesMap must beEqualTo(Map("users" -> userServiceConfig, "analytics" -> analyticsServiceConfig))

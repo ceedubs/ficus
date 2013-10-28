@@ -4,6 +4,8 @@ import com.typesafe.config.{Config, ConfigFactory}
 import net.ceedubs.ficus.FicusConfig._
 import scala.concurrent.duration.FiniteDuration
 
+case class SomeCaseClass(foo: String, bar: Int, baz: Option[FiniteDuration])
+
 class Examples {
   val config: Config = ConfigFactory.load() // standard Typesafe Config
 
@@ -18,4 +20,9 @@ class Examples {
 
   // something such as "15 minutes" can be converted to a FiniteDuration
   val retryInterval: FiniteDuration = config.as[FiniteDuration]("retryInterval")
+
+  // can hydrate most arbitrary types
+  // it first tries to use an apply method on the companion object and falls back to the primary constructor
+  // if values are not in the config, they will fall back to the default value on the class/apply method
+  val someCaseClass: SomeCaseClass = config.as[SomeCaseClass]("someCaseClass")
 }
