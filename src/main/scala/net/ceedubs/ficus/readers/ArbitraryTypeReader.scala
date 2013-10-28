@@ -1,19 +1,19 @@
 package net.ceedubs.ficus.readers
 
 import com.typesafe.config.Config
-import scala.reflect.internal.{StdNames, SymbolTable, Definitions}
 import scala.language.experimental.macros
+import scala.reflect.internal.{StdNames, SymbolTable, Definitions}
 
-trait CompanionApplyReader {
-  implicit def companionApplyValueReader[T]: ValueReader[T] = macro CompanionApplyReaderMacros.companionApplyValueReader[T]
+trait ArbitraryTypeReader {
+  implicit def arbitraryTypeValueReader[T]: ValueReader[T] = macro ArbitraryTypeReaderMacros.arbitraryTypeValueReader[T]
 }
 
-object CompanionApplyReader extends CompanionApplyReader
+object ArbitraryTypeReader extends ArbitraryTypeReader
 
-object CompanionApplyReaderMacros {
+object ArbitraryTypeReaderMacros {
   import scala.reflect.macros.Context
 
-  def companionApplyValueReader[T : c.WeakTypeTag](c: Context): c.Expr[ValueReader[T]] = {
+  def arbitraryTypeValueReader[T : c.WeakTypeTag](c: Context): c.Expr[ValueReader[T]] = {
     import c.universe._
 
     reify {
@@ -42,37 +42,48 @@ object CompanionApplyReaderMacros {
       case x: MethodSymbol => x
     }
 
-    if (!applyMethod.isPublic) fail(s"the apply method in its companion object is not public")
     if (!(applyMethod.returnType <:< tpe)) fail(s"the apply method in its companion object returns type ${applyMethod.returnType} instead of $tpe")
-    val applyArgs = applyMethod.paramss.head.zipWithIndex map { case (param, index) =>
+
+    val instantiationArgs = extractMethodArgsFromConfig(c)(method = applyMethod,
+      companionObjectMaybe = Some(companionSymbol), config = config, path = path, fail = fail)
+
+    val tApply = Select(Ident(companionSymbol), applyMethod.name)
+    c.Expr[T](Apply(tApply, instantiationArgs))
+  }
+
+  def extractMethodArgsFromConfig(c: Context)(method: c.universe.MethodSymbol, companionObjectMaybe: Option[c.Symbol],
+                                              config: c.Expr[Config], path: c.Expr[String], fail: String => Nothing): List[c.Tree] = {
+    import c.universe._
+
+    val decodedMethodName = method.name.decoded
+
+    if (!method.isPublic) fail(s"'$decodedMethodName' method is not public")
+    method.paramss.head.zipWithIndex map { case (param, index) =>
       val name = param.name.decoded
       val nameExpr = c.literal(name)
-      val returnType: Type = param.typeSignatureIn(tpe)
+      val returnType: Type = param.typeSignature
       val key = reify(path.splice + "." + nameExpr.splice)
 
       val readerType = appliedType(weakTypeOf[ValueReader[_]].typeConstructor, List(returnType))
       val reader = c.inferImplicitValue(readerType, silent = true) match {
-        case EmptyTree => fail(s"an implicit value reader of type $readerType must be in scope to read parameter '$name' on 'apply' method of object $tpe")
+        case EmptyTree => fail(s"an implicit value reader of type $readerType must be in scope to read parameter '$name' on '$decodedMethodName' method")
         case x => x
       }
 
-      if (param.asTerm.isParamWithDefault) {
+      companionObjectMaybe.filter(_ => param.asTerm.isParamWithDefault) map { companionObject =>
         val optionReader = Apply(Select(reify(OptionReader).tree, newTermName("optionValueReader")), List(reader))
         val argValueMaybe = readConfigValue(c)(config, key, optionReader)
         Apply(Select(argValueMaybe.tree, newTermName("getOrElse")), List({
           // fall back to default value for param
           val u = c.universe.asInstanceOf[Definitions with SymbolTable with StdNames]
-          val getter = u.nme.defaultGetterName(u.newTermName("apply"), index + 1)
-          Select(Ident(companionSymbol), newTermName(getter.encoded))
+          val getter = u.nme.defaultGetterName(u.newTermName(decodedMethodName), index + 1)
+          Select(Ident(companionObject), newTermName(getter.encoded))
         }))
-      } else {
+      } getOrElse {
         val argValue = readConfigValue(c)(config, key, reader)
         argValue.tree
       }
     }
-
-    val tApply = Select(Ident(companionSymbol), applyMethod.name)
-    c.Expr[T](Apply(tApply, applyArgs))
   }
 
   def readConfigValue[T: c.universe.WeakTypeTag](c: Context)(config: c.Expr[Config], path: c.Expr[String], reader: c.Tree): c.Expr[T] = {

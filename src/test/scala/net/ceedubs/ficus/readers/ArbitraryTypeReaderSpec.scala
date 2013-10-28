@@ -4,7 +4,7 @@ package readers
 import com.typesafe.config.ConfigFactory
 import FicusConfig._
 
-class CompanionApplyReaderSpec extends Spec { def is =
+class ArbitraryTypeReaderSpec extends Spec { def is =
   "A companion apply reader should" ^
     "instantiate an instance with a single-param apply method" ! instantiateSingleParam ^
     "instantiate an instance with a multi-param apply method" ! instantiateMultiParam ^
@@ -12,11 +12,11 @@ class CompanionApplyReaderSpec extends Spec { def is =
     "fall back to a default value" ! fallBackToADefaultValue ^
     "ignore a default value if a value is in config" ! ignoreDefault
 
-  import CompanionApplyReaderSpec._
+  import ArbitraryTypeReaderSpec._
 
   def instantiateSingleParam = {
     val cfg = ConfigFactory.parseString("""simple { foo2 = "foo" }""")
-    val instance: WithSimpleCompanionApply = companionApplyValueReader[WithSimpleCompanionApply].read(cfg, "simple")
+    val instance: WithSimpleCompanionApply = arbitraryTypeValueReader[WithSimpleCompanionApply].read(cfg, "simple")
     instance.foo must_== "foo"
   }
 
@@ -27,27 +27,27 @@ class CompanionApplyReaderSpec extends Spec { def is =
         |  foo = "foo"
         |  bar = 3
         |}""".stripMargin)
-    val instance: WithMultiCompanionApply = companionApplyValueReader[WithMultiCompanionApply].read(cfg, "multi")
+    val instance: WithMultiCompanionApply = arbitraryTypeValueReader[WithMultiCompanionApply].read(cfg, "multi")
     (instance.foo must_== "foo") and (instance.bar must_== 3)
   }
 
   def fallBackToADefaultValue = {
     val cfg = ConfigFactory.parseString("withDefault { }")
-    companionApplyValueReader[WithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
+    arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
   }
 
   def withOptionField = {
     val cfg = ConfigFactory.parseString("""withOption { option = "here" }""")
-    companionApplyValueReader[WithOption].read(cfg, "withOption").option must_== Some("here")
+    arbitraryTypeValueReader[WithOption].read(cfg, "withOption").option must_== Some("here")
   }
 
   def ignoreDefault = {
     val cfg = ConfigFactory.parseString("""withDefault { foo = "notDefault" }""")
-    companionApplyValueReader[WithDefault].read(cfg, "withDefault").foo must_== "notDefault"
+    arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== "notDefault"
   }
 }
 
-object CompanionApplyReaderSpec {
+object ArbitraryTypeReaderSpec {
   trait WithSimpleCompanionApply {
     def foo: String
   }
