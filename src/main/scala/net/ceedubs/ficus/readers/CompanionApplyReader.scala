@@ -29,15 +29,20 @@ object CompanionApplyReaderMacros {
     import c.universe._
 
     val tpe = weakTypeOf[T]
+
+    def fail(reason: String) = c.abort(c.enclosingPosition, s"Cannot generate a config value reader for type $tpe, because $reason")
+
     val companionSymbol = tpe.typeSymbol.companionSymbol match {
-      case NoSymbol => c.abort(c.enclosingPosition, s"Cannot generate a config value reader for type $tpe, because it does not have a companion object with an apply method")
+      case NoSymbol => fail("it does not have a companion object with an apply method")
       case x => x
     }
     val applyMethod = companionSymbol.typeSignature.member(newTermName("apply")) match {
-      case NoSymbol => c.abort(c.enclosingPosition, s"Cannot generate a config value reader for type $tpe, because its companion object does not have an apply method")
-      case x: TermSymbol if x.isOverloaded => c.abort(c.enclosingPosition, s"Cannot generate a config value reader for type $tpe, because the apply method in its companion object is overloaded")
+      case NoSymbol => fail("its companion object does not have an apply method")
+      case x: TermSymbol if x.isOverloaded => fail("the apply method in its companion object is overloaded")
       case x: MethodSymbol => x
     }
+
+    if (!(applyMethod.returnType <:< tpe)) fail(s"the apply method in its companion object returns type ${applyMethod.returnType} instead of $tpe")
     val applyArgs = applyMethod.paramss.head.zipWithIndex map { case (param, index) =>
       val name = param.name.decoded
       val nameExpr = c.literal(name)
@@ -46,9 +51,7 @@ object CompanionApplyReaderMacros {
 
       val readerType = appliedType(weakTypeOf[ValueReader[_]].typeConstructor, List(returnType))
       val reader = c.inferImplicitValue(readerType, silent = true) match {
-        case EmptyTree =>
-          c.abort(c.enclosingPosition,
-            s"An implicit value reader of type $readerType must be in scope to read parameter '$name' on 'apply' method of object $tpe")
+        case EmptyTree => fail(s"an implicit value reader of type $readerType must be in scope to read parameter '$name' on 'apply' method of object $tpe")
         case x => x
       }
 
