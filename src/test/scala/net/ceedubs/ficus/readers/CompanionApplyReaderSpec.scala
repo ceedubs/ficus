@@ -2,8 +2,9 @@ package net.ceedubs.ficus
 package readers
 
 import com.typesafe.config.ConfigFactory
+import FicusConfig._
 
-class CompanionApplyReaderSpec extends Spec with CompanionApplyReader with StringReader with AnyValReaders with OptionReader { def is =
+class CompanionApplyReaderSpec extends Spec { def is =
   "A companion apply reader should" ^
     "instantiate an instance with a single-param apply method" ! instantiateSingleParam ^
     "instantiate an instance with a multi-param apply method" ! instantiateMultiParam ^

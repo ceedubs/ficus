@@ -37,7 +37,7 @@ class CaseClassReadersSpec extends Spec { def is =
 
   def hydrateSimpleCaseClass = {
     val cfg = ConfigFactory.parseString("simple { bool = true }")
-    caseClassValueReader[SimpleCaseClass].read(cfg, "simple") must_== SimpleCaseClass(bool = true)
+    cfg.as[SimpleCaseClass]("simple") must_== SimpleCaseClass(bool = true)
   }
 
   def multipleFields = {
@@ -48,12 +48,12 @@ class CaseClassReadersSpec extends Spec { def is =
         |  long = 42
         |}
       """.stripMargin)
-    caseClassValueReader[MultipleFields].read(cfg, "multipleFields") must_== MultipleFields(string = "foo", long = 42)
+    cfg.as[MultipleFields]("multipleFields") must_== MultipleFields(string = "foo", long = 42)
   }
 
   def withOptionField = {
     val cfg = ConfigFactory.parseString("""withOption { option = "here" }""")
-    caseClassValueReader[WithOption].read(cfg, "withOption") must_== WithOption(Some("here"))
+    cfg.as[WithOption]("withOption") must_== WithOption(Some("here"))
   }
 
   def withNestedCaseClass = {
@@ -65,13 +65,13 @@ class CaseClassReadersSpec extends Spec { def is =
         |  }
         |}
       """.stripMargin)
-    caseClassValueReader[WithNestedCaseClass].read(cfg, "withNested") must_== WithNestedCaseClass(
+    cfg.as[WithNestedCaseClass]("withNested") must_== WithNestedCaseClass(
       simple = SimpleCaseClass(bool = true))
   }
 
   def topLevelValueClass = {
     val cfg = ConfigFactory.parseString("valueClass { int = 3 }")
-    caseClassValueReader[ValueClass].read(cfg, "valueClass") must_== ValueClass(3)
+    cfg.as[ValueClass]("valueClass") must_== ValueClass(3)
   }
 
   def nestedValueClass = {
@@ -83,13 +83,13 @@ class CaseClassReadersSpec extends Spec { def is =
         |  }
         |}
       """.stripMargin)
-    caseClassValueReader[WithNestedValueClass].read(cfg, "withNestedValueClass") must_== WithNestedValueClass(
+    cfg.as[WithNestedValueClass]("withNestedValueClass") must_== WithNestedValueClass(
       valueClass = ValueClass(int = 5))
   }
 
   def fallbackToDefault = {
     val cfg = ConfigFactory.parseString("""withDefault { }""")
-    caseClassValueReader[WithDefault].read(cfg, "withDefault") must_== WithDefault()
+    cfg.as[WithDefault]("withDefault") must_== WithDefault()
   }
 
   def combination = {

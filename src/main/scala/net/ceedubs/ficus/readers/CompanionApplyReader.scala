@@ -5,7 +5,7 @@ import scala.reflect.internal.{StdNames, SymbolTable, Definitions}
 import scala.language.experimental.macros
 
 trait CompanionApplyReader {
-  def companionApplyValueReader[T]: ValueReader[T] = macro CompanionApplyReaderMacros.companionApplyValueReader[T]
+  implicit def companionApplyValueReader[T]: ValueReader[T] = macro CompanionApplyReaderMacros.companionApplyValueReader[T]
 }
 
 object CompanionApplyReader extends CompanionApplyReader
