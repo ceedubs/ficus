@@ -24,14 +24,6 @@ scmInfo := Some(
 /* scala versions and options */
 scalaVersion := "2.10.2"
 
-scalaBinaryVersion  := "2.10.2"
-
-crossScalaVersions := Seq(
-  "2.10.2", "2.10.3"
-)
-
-crossVersion := CrossVersion.full
-
 // These options will be used for *all* versions.
 scalacOptions ++= Seq(
   "-deprecation",
@@ -64,9 +56,9 @@ javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 /* dependencies */
 libraryDependencies <++= scalaVersion { sv =>
   Seq(
-    "org.specs2"     % "specs2_2.10"    % "1.15-SNAPSHOT" % "test",
-    "com.typesafe"   %  "config"        % "1.0.0",
-    "org.scala-lang" % "scala-compiler" % sv)
+    "org.specs2"     %% "specs2"         % "1.15-SNAPSHOT" % "test",
+    "com.typesafe"   %  "config"         % "1.0.0",
+    "org.scala-lang" %  "scala-compiler" % sv)
 }
 
 /* you may need these repos */
