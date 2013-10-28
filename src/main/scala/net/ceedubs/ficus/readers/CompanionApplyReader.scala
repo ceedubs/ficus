@@ -63,7 +63,7 @@ object CompanionApplyReaderMacros {
           // fall back to default value for param
           val u = c.universe.asInstanceOf[Definitions with SymbolTable with StdNames]
           val getter = u.nme.defaultGetterName(u.newTermName("apply"), index + 1)
-          Select(Ident(tpe.typeSymbol.companionSymbol), newTermName(getter.encoded))
+          Select(Ident(companionSymbol), newTermName(getter.encoded))
         }))
       } else {
         val argValue = readConfigValue(c)(config, key, reader)
@@ -71,9 +71,7 @@ object CompanionApplyReaderMacros {
       }
     }
 
-    val tApply = Select(
-      Ident(tpe.typeSymbol.companionSymbol),
-      newTermName("apply"))
+    val tApply = Select(Ident(companionSymbol), applyMethod.name)
     c.Expr[T](Apply(tApply, applyArgs))
   }
 
