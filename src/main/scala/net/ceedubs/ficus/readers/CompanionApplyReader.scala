@@ -42,6 +42,7 @@ object CompanionApplyReaderMacros {
       case x: MethodSymbol => x
     }
 
+    if (!applyMethod.isPublic) fail(s"the apply method in its companion object is not public")
     if (!(applyMethod.returnType <:< tpe)) fail(s"the apply method in its companion object returns type ${applyMethod.returnType} instead of $tpe")
     val applyArgs = applyMethod.paramss.head.zipWithIndex map { case (param, index) =>
       val name = param.name.decoded
