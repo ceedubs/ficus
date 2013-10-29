@@ -25,7 +25,20 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is =
     "read an boolean map" ! readStringBooleanMap ^
     "read an int map" ! readStringIntMap ^
     "read a long map" ! readStringLongMap ^
-    "read a double map" ! readStringDoubleMap
+    "read a double map" ! readStringDoubleMap ^
+                        end ^
+  "The array value reader should" ^
+    "read an array" ! readStringArray ^
+                    end ^
+   "The indexed seq value reader should" ^
+    "read an indexed seq" ! readStringIndexedSeq ^
+                          end ^
+   "The iterable value reader should" ^
+    "read an iterable" ! readStringIterable ^
+                        end ^
+   "The vector value reader should" ^
+    "read a vector" ! readStringVector ^
+                    end
 
   def readStringList = {
     val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c"]""")
@@ -132,6 +145,26 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is =
         |}
       """.stripMargin)
     delegatingMapValueReader[Double].read(cfg, "context.myValue") must beEqualTo(Map("item1" -> 0.0, "item2" -> 1.03))
+  }
+
+  def readStringArray = {
+    val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c"]""")
+    delegatingArrayReader[String].read(cfg, "myValue") must beEqualTo(Array("a", "b", "c"))
+  }
+
+  def readStringIndexedSeq = {
+    val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c"]""")
+    delegatingIndexedSeqReader[String].read(cfg, "myValue") must beEqualTo(IndexedSeq("a", "b", "c"))
+  }
+
+  def readStringIterable = {
+    val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c"]""")
+    delegatingIterableReader[String].read(cfg, "myValue") must beEqualTo(Iterable("a", "b", "c"))
+  }
+
+  def readStringVector = {
+    val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c"]""")
+    delegatingVectorReader[String].read(cfg, "myValue") must beEqualTo(Vector("a", "b", "c"))
   }
 
 }
