@@ -5,22 +5,32 @@ import com.typesafe.config.ConfigFactory
 import FicusConfig._
 
 class ArbitraryTypeReaderSpec extends Spec { def is =
-  "A companion apply reader should" ^
-    "instantiate an instance with a single-param apply method" ! instantiateSingleParam ^
-    "instantiate an instance with a multi-param apply method" ! instantiateMultiParam ^
+  "A arbitrary type reader should" ^
+    "instantiate an instance with a single-param apply method" ! instantiateSingleParamApply ^
+    "instantiate an instance with no apply method but a single constructor with a single param" ! instantiateSingleParamConstructor ^
+    "instantiate an instance with a multi-param apply method" ! instantiateMultiParamApply ^
+    "instantiate an instance with no apply method but a single constructor with multiple params" ! instantiateMultiParamConstructor ^
     "use another implicit value reader for a field" ! withOptionField ^
-    "fall back to a default value" ! fallBackToADefaultValue ^
-    "ignore a default value if a value is in config" ! ignoreDefault
+    "fall back to a default value on an apply method" ! fallBackToApplyMethodDefaultValue ^
+    "fall back to a default value on a constructor arg" ! fallBackToConstructorDefaultValue ^
+    "ignore a default value on an apply method if a value is in config" ! ignoreApplyParamDefault ^
+    "ignore a default value in a constructor if a value is in config" ! ignoreConstructorParamDefault
 
   import ArbitraryTypeReaderSpec._
 
-  def instantiateSingleParam = {
+  def instantiateSingleParamApply = {
     val cfg = ConfigFactory.parseString("""simple { foo2 = "foo" }""")
     val instance: WithSimpleCompanionApply = arbitraryTypeValueReader[WithSimpleCompanionApply].read(cfg, "simple")
     instance.foo must_== "foo"
   }
 
-  def instantiateMultiParam = {
+  def instantiateSingleParamConstructor = {
+    val cfg = ConfigFactory.parseString("""singleParam { foo = "foo" }""")
+    val instance: ClassWithSingleParam = arbitraryTypeValueReader[ClassWithSingleParam].read(cfg, "singleParam")
+    instance.getFoo must_== "foo"
+  }
+
+  def instantiateMultiParamApply = {
     val cfg = ConfigFactory.parseString(
       """
         |multi {
@@ -31,9 +41,25 @@ class ArbitraryTypeReaderSpec extends Spec { def is =
     (instance.foo must_== "foo") and (instance.bar must_== 3)
   }
 
-  def fallBackToADefaultValue = {
+  def instantiateMultiParamConstructor = {
+    val cfg = ConfigFactory.parseString(
+      """
+        |multi {
+        |  foo = "foo"
+        |  bar = 3
+        |}""".stripMargin)
+    val instance: ClassWithMultipleParams = arbitraryTypeValueReader[ClassWithMultipleParams].read(cfg, "multi")
+    (instance.foo must_== "foo") and (instance.bar must_== 3)
+  }
+
+  def fallBackToApplyMethodDefaultValue = {
     val cfg = ConfigFactory.parseString("withDefault { }")
     arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
+  }
+
+  def fallBackToConstructorDefaultValue = {
+    val cfg = ConfigFactory.parseString("withDefault { }")
+    arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
   }
 
   def withOptionField = {
@@ -41,9 +67,14 @@ class ArbitraryTypeReaderSpec extends Spec { def is =
     arbitraryTypeValueReader[WithOption].read(cfg, "withOption").option must_== Some("here")
   }
 
-  def ignoreDefault = {
+  def ignoreApplyParamDefault = {
     val cfg = ConfigFactory.parseString("""withDefault { foo = "notDefault" }""")
     arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== "notDefault"
+  }
+
+  def ignoreConstructorParamDefault = {
+    val cfg = ConfigFactory.parseString("""withDefault { foo = "notDefault" }""")
+    arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must_== "notDefault"
   }
 }
 
@@ -98,4 +129,12 @@ object ArbitraryTypeReaderSpec {
       }
     }
   }
+
+  class ClassWithSingleParam(foo: String) {
+    def getFoo = foo
+  }
+
+  class ClassWithMultipleParams(val foo: String, val bar: Int)
+
+  class ClassWithDefault(val foo: String = "defaultFoo")
 }

@@ -33,22 +33,41 @@ object ArbitraryTypeReaderMacros {
     def fail(reason: String) = c.abort(c.enclosingPosition, s"Cannot generate a config value reader for type $tpe, because $reason")
 
     val companionSymbol = tpe.typeSymbol.companionSymbol match {
-      case NoSymbol => fail("it does not have a companion object with an apply method")
-      case x => x
+      case NoSymbol => None
+      case x => Some(x)
     }
-    val applyMethod = companionSymbol.typeSignature.member(newTermName("apply")) match {
-      case NoSymbol => fail("its companion object does not have an apply method")
+
+    val applyMethod = companionSymbol.flatMap(_.typeSignature.member(newTermName("apply")) match {
+      case NoSymbol => None
       case x: TermSymbol if x.isOverloaded => fail("the apply method in its companion object is overloaded")
-      case x: MethodSymbol => x
+      case m: MethodSymbol =>
+        if (m.returnType <:< tpe) {
+          Some(m)
+        } else {
+          fail(s"the apply method in its companion object returns type ${m.returnType} instead of $tpe")
+        }
+    })
+
+    val instantiationMethod = applyMethod getOrElse {
+      val constructors = tpe.declaration(nme.CONSTRUCTOR).asTerm.alternatives.collect {
+        case m: MethodSymbol => m
+      }
+      constructors match {
+        case Nil => fail("it has no apply method in a companion object, and it doesn't have a constructor")
+        case (head :: Nil) => head
+        case _ => fail("it has no apply method in a companion object, and it has multiple constructors")
+      }
     }
 
-    if (!(applyMethod.returnType <:< tpe)) fail(s"the apply method in its companion object returns type ${applyMethod.returnType} instead of $tpe")
+    if (!(instantiationMethod.returnType <:< tpe)) fail(s"the method $instantiationMethod returns type ${instantiationMethod.returnType} instead of $tpe")
 
-    val instantiationArgs = extractMethodArgsFromConfig(c)(method = applyMethod,
-      companionObjectMaybe = Some(companionSymbol), config = config, path = path, fail = fail)
-
-    val tApply = Select(Ident(companionSymbol), applyMethod.name)
-    c.Expr[T](Apply(tApply, instantiationArgs))
+    val instantiationArgs = extractMethodArgsFromConfig(c)(method = instantiationMethod,
+      companionObjectMaybe = companionSymbol, config = config, path = path, fail = fail)
+    val instantiationObject = companionSymbol.filterNot(_ =>
+      instantiationMethod.isConstructor
+    ).map(Ident(_)).getOrElse(New(Ident(tpe.typeSymbol)))
+    val instantiationCall = Select(instantiationObject, instantiationMethod.name)
+    c.Expr[T](Apply(instantiationCall, instantiationArgs))
   }
 
   def extractMethodArgsFromConfig(c: Context)(method: c.universe.MethodSymbol, companionObjectMaybe: Option[c.Symbol],
@@ -58,6 +77,7 @@ object ArbitraryTypeReaderMacros {
     val decodedMethodName = method.name.decoded
 
     if (!method.isPublic) fail(s"'$decodedMethodName' method is not public")
+
     method.paramss.head.zipWithIndex map { case (param, index) =>
       val name = param.name.decoded
       val nameExpr = c.literal(name)
