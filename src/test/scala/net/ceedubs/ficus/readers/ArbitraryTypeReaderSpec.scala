@@ -6,10 +6,11 @@ import FicusConfig._
 
 class ArbitraryTypeReaderSpec extends Spec { def is =
   "A arbitrary type reader should" ^
-    "instantiate an instance with a single-param apply method" ! instantiateSingleParamApply ^
-    "instantiate an instance with no apply method but a single constructor with a single param" ! instantiateSingleParamConstructor ^
-    "instantiate an instance with a multi-param apply method" ! instantiateMultiParamApply ^
-    "instantiate an instance with no apply method but a single constructor with multiple params" ! instantiateMultiParamConstructor ^
+    "instantiate with a single-param apply method" ! instantiateSingleParamApply ^
+    "instantiate with no apply method but a single constructor with a single param" ! instantiateSingleParamConstructor ^
+    "instantiate with a multi-param apply method" ! instantiateMultiParamApply ^
+    "instantiate with no apply method but a single constructor with multiple params" ! instantiateMultiParamConstructor ^
+    "instantiate with multiple apply methods if only one returns the correct type" ! multipleApply ^
     "use another implicit value reader for a field" ! withOptionField ^
     "fall back to a default value on an apply method" ! fallBackToApplyMethodDefaultValue ^
     "fall back to a default value on a constructor arg" ! fallBackToConstructorDefaultValue ^
@@ -50,6 +51,12 @@ class ArbitraryTypeReaderSpec extends Spec { def is =
         |}""".stripMargin)
     val instance: ClassWithMultipleParams = arbitraryTypeValueReader[ClassWithMultipleParams].read(cfg, "multi")
     (instance.foo must_== "foo") and (instance.bar must_== 3)
+  }
+
+  def multipleApply = {
+    val cfg = ConfigFactory.parseString("""withMultipleApply { foo = "foo" }""")
+    val instance: WithMultipleApplyMethods = arbitraryTypeValueReader[WithMultipleApplyMethods].read(cfg, "withMultipleApply")
+    instance.foo must_== "foo"
   }
 
   def fallBackToApplyMethodDefaultValue = {
@@ -137,4 +144,24 @@ object ArbitraryTypeReaderSpec {
   class ClassWithMultipleParams(val foo: String, val bar: Int)
 
   class ClassWithDefault(val foo: String = "defaultFoo")
+
+  trait WithMultipleApplyMethods {
+    def foo: String
+  }
+
+  object WithMultipleApplyMethods {
+
+    def apply(foo: Option[String]): Option[WithMultipleApplyMethods] = foo map { f =>
+      new WithMultipleApplyMethods {
+        def foo: String = f
+      }
+    }
+
+    def apply(foo: String): WithMultipleApplyMethods = {
+      val _foo = foo
+      new WithMultipleApplyMethods {
+        def foo: String = _foo
+      }
+    }
+  }
 }
