@@ -13,7 +13,7 @@ trait FicusConfig {
   def apply[A](key: ConfigKey[A])(implicit reader: ValueReader[A]): A = as[A](key.path)
 }
 
-case class SimpleFicusConfig(config: Config) extends FicusConfig
+final case class SimpleFicusConfig(config: Config) extends FicusConfig
 
 object FicusConfig extends AllValueReaderInstances {
   implicit def toFicusConfig(config: Config): FicusConfig = SimpleFicusConfig(config)
