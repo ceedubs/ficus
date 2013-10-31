@@ -5,9 +5,8 @@ import net.ceedubs.ficus.Spec
 
 class AnyValReadersSpec extends Spec with AnyValReaders { def is =
   "The Boolean value reader should" ^
-    "read a true" ! booleanReadTrue ^
-    "read a false" ! booleanReadFalse ^
-                                      end ^
+    "read a boolean" ! readBoolean ^
+                               end ^
   "The Int value reader should" ^
     "read an int" ! readInt ^
     "read a double as an int" ! readDoubleAsInt ^
@@ -20,43 +19,40 @@ class AnyValReadersSpec extends Spec with AnyValReaders { def is =
     "read a double" ! readDouble ^
     "read an int as a double" ! readIntAsDouble
 
-  def booleanReadTrue = {
-    val cfg = ConfigFactory.parseString("myValue = true")
-    booleanValueReader.read(cfg, "myValue") must beTrue
+  def readBoolean = check { b: Boolean =>
+    val cfg = ConfigFactory.parseString(s"myValue = $b")
+    booleanValueReader.read(cfg, "myValue") must beEqualTo(b)
   }
 
-  def booleanReadFalse = {
-    val cfg = ConfigFactory.parseString("myValue = false")
-    booleanValueReader.read(cfg, "myValue") must beFalse
-  }
-
-  def readInt = {
-    val cfg = ConfigFactory.parseString("myValue = 4")
-    intValueReader.read(cfg, "myValue") must beEqualTo(4)
+  def readInt = check { i: Int =>
+    val cfg = ConfigFactory.parseString(s"myValue = $i")
+    intValueReader.read(cfg, "myValue") must beEqualTo(i)
   }
   
-  def readDoubleAsInt = {
-    val cfg = ConfigFactory.parseString("myValue = 109.3")
-    intValueReader.read(cfg, "myValue") must beEqualTo(109)
-  } 
+  def readDoubleAsInt = check { d: Double =>
+    (d >= Int.MinValue && d <= Int.MaxValue) ==> {
+      val cfg = ConfigFactory.parseString(s"myValue = $d")
+      intValueReader.read(cfg, "myValue") must beEqualTo(d.toInt)
+    }
+  }
 
-  def readLong = {
-    val cfg = ConfigFactory.parseString("myValue = 4123098334081023948")
-    longValueReader.read(cfg, "myValue") must beEqualTo(4123098334081023948L)
+  def readLong = check { l: Long =>
+    val cfg = ConfigFactory.parseString(s"myValue = $l")
+    longValueReader.read(cfg, "myValue") must beEqualTo(l)
   }
   
-  def readIntAsLong = {
-    val cfg = ConfigFactory.parseString("myValue = 10")
-    longValueReader.read(cfg, "myValue") must beEqualTo(10L)
+  def readIntAsLong = check { i: Int =>
+    val cfg = ConfigFactory.parseString(s"myValue = $i")
+    longValueReader.read(cfg, "myValue") must beEqualTo(i.toLong)
   }
 
-  def readDouble = {
-    val cfg = ConfigFactory.parseString("myValue = 1.234")
-    doubleValueReader.read(cfg, "myValue") must beEqualTo(1.234)
+  def readDouble = check { d: Double =>
+    val cfg = ConfigFactory.parseString(s"myValue = $d")
+    doubleValueReader.read(cfg, "myValue") must beEqualTo(d)
   }
 
- def readIntAsDouble = {
-    val cfg = ConfigFactory.parseString("myValue = 42")
-    doubleValueReader.read(cfg, "myValue") must beEqualTo(42.0)
+ def readIntAsDouble = check { i: Int =>
+    val cfg = ConfigFactory.parseString(s"myValue = $i")
+    doubleValueReader.read(cfg, "myValue") must beEqualTo(i.toDouble)
   }
 }
