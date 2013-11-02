@@ -17,17 +17,18 @@ object CaseClassReadersSpec {
                  withNestedValueClass: WithNestedValueClass)
 }
 
-class CaseClassReadersSpec extends Spec { def is =
-  "A case class reader should" ^
-    "be able to be used implicitly" ! useImplicitly ^
-    "hydrate a simple case class" ! hydrateSimpleCaseClass ^
-    "hydrate a case class with multiple fields" ! multipleFields ^
-    "use another implicit value reader for a field" ! withOptionField ^
-    "read a nested case class" ! withNestedCaseClass ^
-    "read a top-level value class" ! topLevelValueClass ^
-    "read a nested value class" ! nestedValueClass ^
-    "fall back to a default value" ! fallbackToDefault ^
-    "do a combination of these things" ! combination
+class CaseClassReadersSpec extends Spec { def is = s2"""
+  A case class reader should
+    be able to be used implicitly $useImplicitly
+    hydrate a simple case class $hydrateSimpleCaseClass
+    hydrate a case class with multiple fields $multipleFields
+    use another implicit value reader for a field $withOptionField
+    read a nested case class $withNestedCaseClass
+    read a top-level value class $topLevelValueClass
+    read a nested value class $nestedValueClass
+    fall back to a default value $fallbackToDefault
+    do a combination of these things $combination
+  """
 
   import CaseClassReadersSpec._
 

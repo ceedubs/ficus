@@ -5,9 +5,10 @@ import com.typesafe.config.ConfigFactory
 import org.scalacheck.Prop
 import ConfigSerializerOps._
 
-class StringReaderSpec extends Spec with StringReader { def is =
-  "The String value reader should" ^
-    "read a String" ! readString
+class StringReaderSpec extends Spec with StringReader { def is = s2"""
+  The String value reader should
+    read a String $readString
+  """
 
   def readString = Prop.forAll(jsonStringValue) { string: String =>
     val cfg = ConfigFactory.parseString(s"myValue = ${string.asConfigValue}")

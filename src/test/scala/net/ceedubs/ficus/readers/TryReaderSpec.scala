@@ -5,12 +5,13 @@ import net.ceedubs.ficus.Spec
 import org.scalacheck.Prop
 import scala.util.Failure
 
-class TryReaderSpec extends Spec with TryReader with AnyValReaders { def is =
-  "A try value reader should" ^
-    "return a success when a value can be read" ! successWhenPresent ^
-    "return a failure when a value cannot be read" ! cannotBeRead ^
-    "handle an unexpected exception type" ! unexpectedExceptionType ^
-    "handle an unexpected exception" ! unexpectedException
+class TryReaderSpec extends Spec with TryReader with AnyValReaders { def is = s2"""
+  A try value reader should
+    return a success when a value can be read $successWhenPresent
+    return a failure when a value cannot be read $cannotBeRead
+    handle an unexpected exception type $unexpectedExceptionType
+    handle an unexpected exception $unexpectedException
+  """
 
   def successWhenPresent = prop { i: Int =>
     val cfg = ConfigFactory.parseString(s"myValue = $i")

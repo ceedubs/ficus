@@ -5,18 +5,19 @@ import com.typesafe.config.ConfigFactory
 import FicusConfig._
 import ConfigSerializerOps._
 
-class ArbitraryTypeReaderSpec extends Spec { def is =
-  "A arbitrary type reader should" ^
-    "instantiate with a single-param apply method" ! instantiateSingleParamApply ^
-    "instantiate with no apply method but a single constructor with a single param" ! instantiateSingleParamConstructor ^
-    "instantiate with a multi-param apply method" ! instantiateMultiParamApply ^
-    "instantiate with no apply method but a single constructor with multiple params" ! instantiateMultiParamConstructor ^
-    "instantiate with multiple apply methods if only one returns the correct type" ! multipleApply ^
-    "use another implicit value reader for a field" ! withOptionField ^
-    "fall back to a default value on an apply method" ! fallBackToApplyMethodDefaultValue ^
-    "fall back to a default value on a constructor arg" ! fallBackToConstructorDefaultValue ^
-    "ignore a default value on an apply method if a value is in config" ! ignoreApplyParamDefault ^
-    "ignore a default value in a constructor if a value is in config" ! ignoreConstructorParamDefault
+class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
+  An arbitrary type reader should
+    instantiate with a single-param apply method $instantiateSingleParamApply
+    instantiate with no apply method but a single constructor with a single param $instantiateSingleParamConstructor
+    instantiate with a multi-param apply method $instantiateMultiParamApply
+    instantiate with no apply method but a single constructor with multiple params $instantiateMultiParamConstructor
+    instantiate with multiple apply methods if only one returns the correct type $multipleApply
+    use another implicit value reader for a field $withOptionField
+    fall back to a default value on an apply method $fallBackToApplyMethodDefaultValue
+    fall back to a default value on a constructor arg $fallBackToConstructorDefaultValue
+    ignore a default value on an apply method if a value is in config $ignoreApplyParamDefault
+    ignore a default value in a constructor if a value is in config $ignoreConstructorParamDefault
+  """
 
   import ArbitraryTypeReaderSpec._
 

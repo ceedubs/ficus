@@ -5,17 +5,18 @@ import com.typesafe.config.ConfigFactory
 import scala.concurrent.duration._
 import org.scalacheck.{Gen, Prop}
 
-class DurationReadersSpec extends Spec with DurationReaders with DeactivatedTimeConversions { def is =
-  "The finite duration reader should" ^
-    "read a millisecond value" ! readMillis ^
-    "read a minute value" ! readMinute
+class DurationReadersSpec extends Spec with DurationReaders with DeactivatedTimeConversions { def is = s2"""
+  The finite duration reader should
+    read a millisecond value $readMillis
+    read a minute value $readMinutes
+  """
 
   def readMillis = prop { i: Int =>
     val cfg = ConfigFactory.parseString(s"myValue = $i")
     finiteDurationReader.read(cfg, "myValue") must beEqualTo(i millis)
   }
 
-  def readMinute = Prop.forAll(Gen.choose(1.5e-8.toInt, 1.5e8.toInt)) { i: Int =>
+  def readMinutes = Prop.forAll(Gen.choose(1.5e-8.toInt, 1.5e8.toInt)) { i: Int =>
     val cfg = ConfigFactory.parseString("myValue = \"" + i + " minutes\"")
     finiteDurationReader.read(cfg, "myValue") must beEqualTo(i minutes)
   }

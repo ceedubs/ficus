@@ -3,9 +3,10 @@ package readers
 
 import com.typesafe.config.ConfigFactory
 
-class ConfigReaderSpec extends Spec with ConfigReader with AnyValReaders { def is =
-  "The Config value reader should" ^
-    "read a config" ! readConfig
+class ConfigReaderSpec extends Spec with ConfigReader with AnyValReaders { def is = s2"""
+  The Config value reader should
+    read a config $readConfig
+  """
 
   def readConfig = prop { i: Int =>
     val cfg = ConfigFactory.parseString(

@@ -7,14 +7,15 @@ import StringReader.stringValueReader
 import ConfigSerializerOps._
 import org.scalacheck.util.Buildable
 
-class CollectionReadersSpec extends Spec with CollectionReaders { def is =
-  "The collection value readers should" ^
-    "read a list" ! readList ^
-    "read a set" ! readSet ^
-    "read an array" ! readArray ^
-    "read an indexed sequence" ! readIndexedSeq ^
-    "read a vector" ! readVector ^
-    "read an iterable" ! readIterable
+class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
+  The collection value readers should
+    read a list $readList
+    read a set $readSet
+    read an array $readArray
+    read an indexed sequence $readIndexedSeq
+    read a vector $readVector
+    read an iterable $readIterable
+  """
 
   import CollectionReaderSpec._
 
