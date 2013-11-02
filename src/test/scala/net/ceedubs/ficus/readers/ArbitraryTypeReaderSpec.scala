@@ -3,6 +3,7 @@ package readers
 
 import com.typesafe.config.ConfigFactory
 import FicusConfig._
+import ConfigSerializerOps._
 
 class ArbitraryTypeReaderSpec extends Spec { def is =
   "A arbitrary type reader should" ^
@@ -19,44 +20,44 @@ class ArbitraryTypeReaderSpec extends Spec { def is =
 
   import ArbitraryTypeReaderSpec._
 
-  def instantiateSingleParamApply = {
-    val cfg = ConfigFactory.parseString("""simple { foo2 = "foo" }""")
+  def instantiateSingleParamApply = prop { foo2: String =>
+    val cfg = ConfigFactory.parseString(s"simple { foo2 = ${foo2.asConfigValue} }")
     val instance: WithSimpleCompanionApply = arbitraryTypeValueReader[WithSimpleCompanionApply].read(cfg, "simple")
-    instance.foo must_== "foo"
+    instance.foo must_== foo2
   }
 
-  def instantiateSingleParamConstructor = {
-    val cfg = ConfigFactory.parseString("""singleParam { foo = "foo" }""")
+  def instantiateSingleParamConstructor = prop { foo: String =>
+    val cfg = ConfigFactory.parseString(s"singleParam { foo = ${foo.asConfigValue} }")
     val instance: ClassWithSingleParam = arbitraryTypeValueReader[ClassWithSingleParam].read(cfg, "singleParam")
-    instance.getFoo must_== "foo"
+    instance.getFoo must_== foo
   }
 
-  def instantiateMultiParamApply = {
+  def instantiateMultiParamApply = prop { (foo: String, bar: Int) =>
     val cfg = ConfigFactory.parseString(
-      """
+      s"""
         |multi {
-        |  foo = "foo"
-        |  bar = 3
+        |  foo = ${foo.asConfigValue}
+        |  bar = $bar
         |}""".stripMargin)
     val instance: WithMultiCompanionApply = arbitraryTypeValueReader[WithMultiCompanionApply].read(cfg, "multi")
-    (instance.foo must_== "foo") and (instance.bar must_== 3)
+    (instance.foo must_== foo) and (instance.bar must_== bar)
   }
 
-  def instantiateMultiParamConstructor = {
+  def instantiateMultiParamConstructor = prop { (foo: String, bar: Int) =>
     val cfg = ConfigFactory.parseString(
-      """
+      s"""
         |multi {
-        |  foo = "foo"
-        |  bar = 3
+        |  foo = ${foo.asConfigValue}
+        |  bar = $bar
         |}""".stripMargin)
     val instance: ClassWithMultipleParams = arbitraryTypeValueReader[ClassWithMultipleParams].read(cfg, "multi")
-    (instance.foo must_== "foo") and (instance.bar must_== 3)
+    (instance.foo must_== foo) and (instance.bar must_== bar)
   }
 
-  def multipleApply = {
-    val cfg = ConfigFactory.parseString("""withMultipleApply { foo = "foo" }""")
+  def multipleApply = prop { foo: String =>
+    val cfg = ConfigFactory.parseString(s"withMultipleApply { foo = ${foo.asConfigValue} }")
     val instance: WithMultipleApplyMethods = arbitraryTypeValueReader[WithMultipleApplyMethods].read(cfg, "withMultipleApply")
-    instance.foo must_== "foo"
+    instance.foo must_== foo
   }
 
   def fallBackToApplyMethodDefaultValue = {
@@ -74,14 +75,14 @@ class ArbitraryTypeReaderSpec extends Spec { def is =
     arbitraryTypeValueReader[WithOption].read(cfg, "withOption").option must_== Some("here")
   }
 
-  def ignoreApplyParamDefault = {
-    val cfg = ConfigFactory.parseString("""withDefault { foo = "notDefault" }""")
-    arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== "notDefault"
+  def ignoreApplyParamDefault = prop { foo: String =>
+    val cfg = ConfigFactory.parseString(s"withDefault { foo = ${foo.asConfigValue} }")
+    arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== foo
   }
 
-  def ignoreConstructorParamDefault = {
-    val cfg = ConfigFactory.parseString("""withDefault { foo = "notDefault" }""")
-    arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must_== "notDefault"
+  def ignoreConstructorParamDefault = prop { foo: String =>
+    val cfg = ConfigFactory.parseString(s"withDefault { foo = ${foo.asConfigValue} }")
+    arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must_== foo
   }
 }
 
