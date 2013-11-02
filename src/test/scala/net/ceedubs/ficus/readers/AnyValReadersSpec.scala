@@ -19,39 +19,39 @@ class AnyValReadersSpec extends Spec with AnyValReaders { def is =
     "read a double" ! readDouble ^
     "read an int as a double" ! readIntAsDouble
 
-  def readBoolean = check { b: Boolean =>
+  def readBoolean = prop { b: Boolean =>
     val cfg = ConfigFactory.parseString(s"myValue = $b")
     booleanValueReader.read(cfg, "myValue") must beEqualTo(b)
   }
 
-  def readInt = check { i: Int =>
+  def readInt = prop { i: Int =>
     val cfg = ConfigFactory.parseString(s"myValue = $i")
     intValueReader.read(cfg, "myValue") must beEqualTo(i)
   }
   
-  def readDoubleAsInt = check { d: Double =>
+  def readDoubleAsInt = prop { d: Double =>
     (d >= Int.MinValue && d <= Int.MaxValue) ==> {
       val cfg = ConfigFactory.parseString(s"myValue = $d")
       intValueReader.read(cfg, "myValue") must beEqualTo(d.toInt)
     }
   }
 
-  def readLong = check { l: Long =>
+  def readLong = prop { l: Long =>
     val cfg = ConfigFactory.parseString(s"myValue = $l")
     longValueReader.read(cfg, "myValue") must beEqualTo(l)
   }
   
-  def readIntAsLong = check { i: Int =>
+  def readIntAsLong = prop { i: Int =>
     val cfg = ConfigFactory.parseString(s"myValue = $i")
     longValueReader.read(cfg, "myValue") must beEqualTo(i.toLong)
   }
 
-  def readDouble = check { d: Double =>
+  def readDouble = prop { d: Double =>
     val cfg = ConfigFactory.parseString(s"myValue = $d")
     doubleValueReader.read(cfg, "myValue") must beEqualTo(d)
   }
 
- def readIntAsDouble = check { i: Int =>
+ def readIntAsDouble = prop { i: Int =>
     val cfg = ConfigFactory.parseString(s"myValue = $i")
     doubleValueReader.read(cfg, "myValue") must beEqualTo(i.toDouble)
   }
