@@ -3,21 +3,22 @@ package net.ceedubs.ficus.readers
 import com.typesafe.config.ConfigFactory
 import net.ceedubs.ficus.Spec
 
-class AnyValReadersSpec extends Spec with AnyValReaders { def is =
-  "The Boolean value reader should" ^
-    "read a boolean" ! readBoolean ^
-                               end ^
-  "The Int value reader should" ^
-    "read an int" ! readInt ^
-    "read a double as an int" ! readDoubleAsInt ^
-                            end ^
-  "The Long value reader should" ^
-    "read a long" ! readLong ^
-    "read an int as a long" ! readIntAsLong ^
-                             end ^
-  "The Double value reader should" ^
-    "read a double" ! readDouble ^
-    "read an int as a double" ! readIntAsDouble
+class AnyValReadersSpec extends Spec with AnyValReaders { def is = s2"""
+  The Boolean value reader should
+    read a boolean $readBoolean
+
+  The Int value reader should
+    read an int $readInt
+    read a double as an int $readDoubleAsInt
+
+  The Long value reader should
+    read a long $readLong
+    read an int as a long $readIntAsLong
+
+  The Double value reader should
+    read a double $readDouble
+    read an int as a double $readIntAsDouble
+  """
 
   def readBoolean = prop { b: Boolean =>
     val cfg = ConfigFactory.parseString(s"myValue = $b")

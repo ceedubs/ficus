@@ -56,7 +56,7 @@ javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 /* dependencies */
 libraryDependencies <++= scalaVersion { sv =>
   Seq(
-    "org.specs2"     %% "specs2"         % "1.15-SNAPSHOT" % "test",
+    "org.specs2"     %% "specs2"         % "2.3.1" % "test",
     "org.scalacheck" %% "scalacheck"     % "1.10.1" % "test",
     "com.typesafe"   %  "config"         % "1.0.0",
     "org.scala-lang" %  "scala-compiler" % sv)

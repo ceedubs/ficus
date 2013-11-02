@@ -7,12 +7,12 @@ import scala.util.Failure
 
 class TryReaderSpec extends Spec with TryReader with AnyValReaders { def is =
   "A try value reader should" ^
-    "return a success when a value can be read" ! success ^
+    "return a success when a value can be read" ! successWhenPresent ^
     "return a failure when a value cannot be read" ! cannotBeRead ^
     "handle an unexpected exception type" ! unexpectedExceptionType ^
     "handle an unexpected exception" ! unexpectedException
 
-  def success = prop { i: Int =>
+  def successWhenPresent = prop { i: Int =>
     val cfg = ConfigFactory.parseString(s"myValue = $i")
     tryValueReader[Int].read(cfg, "myValue") must beSuccessfulTry[Int].withValue(i)
   }

@@ -1,11 +1,10 @@
 package net.ceedubs.ficus
 
-import org.specs2.specification.{FormattingFragments, FragmentsBuilder, BaseSpecification}
 import org.specs2.matcher.MustMatchers
-import org.specs2.ScalaCheck
+import org.specs2.{ScalaCheck, Specification}
 import org.scalacheck.{Arbitrary, Gen}
 
-trait Spec extends BaseSpecification with MustMatchers with FragmentsBuilder with FormattingFragments with ScalaCheck {
+trait Spec extends Specification with MustMatchers with ScalaCheck {
   val jsonStringValue = Spec.jsonStringValue
   implicit val jsonStringArbitrary: Arbitrary[String] = Arbitrary(jsonStringValue)
 }
