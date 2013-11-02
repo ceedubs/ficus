@@ -8,9 +8,9 @@ class OptionReadersSpec extends Spec with OptionReader with AnyValReaders { def 
     "wrap an existing value in a Some" ! optionSome ^
     "return a None for a non-existing value" ! optionNone
 
-  def optionSome = {
-    val cfg = ConfigFactory.parseString("myValue = true")
-    optionValueReader[Boolean].read(cfg, "myValue") must beSome(true)
+  def optionSome = check { i: Int =>
+    val cfg = ConfigFactory.parseString(s"myValue = $i")
+    optionValueReader[Int].read(cfg, "myValue") must beSome(i)
   }
 
   def optionNone = {
