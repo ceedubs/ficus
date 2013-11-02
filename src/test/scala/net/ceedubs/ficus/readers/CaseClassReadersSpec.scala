@@ -3,6 +3,7 @@ package readers
 
 import com.typesafe.config.ConfigFactory
 import net.ceedubs.ficus.FicusConfig._
+import ConfigSerializerOps._
 
 object CaseClassReadersSpec {
   case class SimpleCaseClass(bool: Boolean)
@@ -35,56 +36,56 @@ class CaseClassReadersSpec extends Spec { def is =
     cfg.as[SimpleCaseClass]("simple") must_== SimpleCaseClass(bool = false)
   }
 
-  def hydrateSimpleCaseClass = {
-    val cfg = ConfigFactory.parseString("simple { bool = true }")
-    cfg.as[SimpleCaseClass]("simple") must_== SimpleCaseClass(bool = true)
+  def hydrateSimpleCaseClass = prop { bool: Boolean =>
+    val cfg = ConfigFactory.parseString(s"simple { bool = $bool }")
+    cfg.as[SimpleCaseClass]("simple") must_== SimpleCaseClass(bool = bool)
   }
 
-  def multipleFields = {
+  def multipleFields = prop { (foo: String, long: Long) =>
     val cfg = ConfigFactory.parseString(
-      """
+      s"""
         |multipleFields {
-        |  string = "foo"
-        |  long = 42
+        |  string = ${foo.asConfigValue}
+        |  long = $long
         |}
       """.stripMargin)
-    cfg.as[MultipleFields]("multipleFields") must_== MultipleFields(string = "foo", long = 42)
+    cfg.as[MultipleFields]("multipleFields") must_== MultipleFields(string = foo, long = long)
   }
 
-  def withOptionField = {
-    val cfg = ConfigFactory.parseString("""withOption { option = "here" }""")
-    cfg.as[WithOption]("withOption") must_== WithOption(Some("here"))
+  def withOptionField = prop { s: String =>
+    val cfg = ConfigFactory.parseString(s"""withOption { option = ${s.asConfigValue} }""")
+    cfg.as[WithOption]("withOption") must_== WithOption(Some(s))
   }
 
-  def withNestedCaseClass = {
+  def withNestedCaseClass = prop { bool: Boolean =>
     val cfg = ConfigFactory.parseString(
-      """
+      s"""
         |withNested {
         |  simple {
-        |    bool = true
+        |    bool = $bool
         |  }
         |}
       """.stripMargin)
     cfg.as[WithNestedCaseClass]("withNested") must_== WithNestedCaseClass(
-      simple = SimpleCaseClass(bool = true))
+      simple = SimpleCaseClass(bool = bool))
   }
 
-  def topLevelValueClass = {
-    val cfg = ConfigFactory.parseString("valueClass { int = 3 }")
-    cfg.as[ValueClass]("valueClass") must_== ValueClass(3)
+  def topLevelValueClass = prop { int: Int =>
+    val cfg = ConfigFactory.parseString(s"valueClass { int = $int }")
+    cfg.as[ValueClass]("valueClass") must_== ValueClass(int)
   }
 
-  def nestedValueClass = {
+  def nestedValueClass = prop { int: Int =>
     val cfg = ConfigFactory.parseString(
-      """
+      s"""
         |withNestedValueClass {
         |  valueClass {
-        |    int = 5
+        |    int = $int
         |  }
         |}
       """.stripMargin)
     cfg.as[WithNestedValueClass]("withNestedValueClass") must_== WithNestedValueClass(
-      valueClass = ValueClass(int = 5))
+      valueClass = ValueClass(int = int))
   }
 
   def fallbackToDefault = {
@@ -92,28 +93,28 @@ class CaseClassReadersSpec extends Spec { def is =
     cfg.as[WithDefault]("withDefault") must_== WithDefault()
   }
 
-  def combination = {
+  def combination = prop { (fooBool: Boolean, simpleBool: Boolean, valueClassInt: Int) =>
     val cfg = ConfigFactory.parseString(
-      """
+      s"""
         |foo {
-        |  bool = true
+        |  bool = $fooBool
         |  withNestedCaseClass {
         |    simple {
-        |      bool = false
+        |      bool = $simpleBool
         |    }
         |  }
         |  withNestedValueClass = {
         |    valueClass {
-        |      int = 0
+        |      int = $valueClassInt
         |    }
         |  }
         |}
       """.stripMargin)
     cfg.as[Foo]("foo") must_== Foo(
-      bool = true,
+      bool = fooBool,
       intOpt = None,
-      withNestedCaseClass = WithNestedCaseClass(simple = SimpleCaseClass(bool = false)),
-      withNestedValueClass = WithNestedValueClass(ValueClass(int = 0))
+      withNestedCaseClass = WithNestedCaseClass(simple = SimpleCaseClass(bool = simpleBool)),
+      withNestedValueClass = WithNestedValueClass(ValueClass(int = valueClassInt))
     )
   }
 
