@@ -1,0 +1,42 @@
+package net.ceedubs.ficus
+
+trait ConfigSerializer[A] {
+  def serialize(a: A): String
+}
+
+object ConfigSerializer {
+  def apply[A](f: A => String): ConfigSerializer[A] = new ConfigSerializer[A] {
+    def serialize(a: A): String = f(a)
+  }
+
+  def fromToString[A]: ConfigSerializer[A] = apply[A](_.toString)
+
+  protected def serializeIterable[A](iterable: Iterable[A])(implicit serializer: ConfigSerializer[A]): String = {
+    val elements = iterable.map(a => serializer.serialize(a))
+    s"[${elements.mkString(", ")}]"
+  }
+
+  implicit val stringSerializer = apply[String](s => "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\"")
+  implicit val booleanSerializer = fromToString[Boolean]
+  implicit val intSerializer = fromToString[Int]
+  implicit val longSerializer = fromToString[Long]
+  implicit val doubleSerializer = fromToString[Double]
+
+  implicit def listSerializer[A : ConfigSerializer]: ConfigSerializer[List[A]] = apply[List[A]](serializeIterable)
+  implicit def serializerForSets[A : ConfigSerializer]: ConfigSerializer[Set[A]] = apply[Set[A]](serializeIterable)
+  implicit def indexedSeqSerializer[A : ConfigSerializer]: ConfigSerializer[IndexedSeq[A]] = apply[IndexedSeq[A]](serializeIterable)
+  implicit def vectorSerializer[A : ConfigSerializer]: ConfigSerializer[Vector[A]] = apply[Vector[A]](serializeIterable)
+  implicit def arraySerializer[A : ConfigSerializer]: ConfigSerializer[Array[A]] = apply[Array[A]] { array =>
+    serializeIterable(array.toIterable)
+  }
+  def iterableSerializer[A: ConfigSerializer]: ConfigSerializer[Iterable[A]] = apply[Iterable[A]](serializeIterable)
+}
+
+final case class ConfigSerializerOps[A](a: A, serializer: ConfigSerializer[A]) {
+  def asConfigValue: String = serializer.serialize(a)
+}
+
+object ConfigSerializerOps {
+  implicit def toConfigSerializerOps[A](a: A)(implicit serializer: ConfigSerializer[A]): ConfigSerializerOps[A] =
+    ConfigSerializerOps[A](a, serializer)
+}

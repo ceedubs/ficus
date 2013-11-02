@@ -4,167 +4,83 @@ package readers
 import com.typesafe.config.ConfigFactory
 import AnyValReaders.{booleanValueReader, doubleValueReader, intValueReader, longValueReader}
 import StringReader.stringValueReader
+import ConfigSerializerOps._
+import org.scalacheck.util.Buildable
 
 class CollectionReadersSpec extends Spec with CollectionReaders { def is =
-  "The list value reader should" ^
-    "read a list of strings" ! readStringList ^
-    "read a list of booleans" ! readBooleanList ^
-    "read a list of ints" ! readIntList ^
-    "read a list of longs" ! readLongList ^
-    "read a list of doubles" ! readDoubleList ^
-                             end ^
-  "The set value reader should" ^
-    "read a set of strings" ! readStringSet ^
-    "read a set of booleans" ! readBooleanSet ^
-    "read a set of ints" ! readIntSet ^
-    "read a set of longs" ! readLongSet ^
-    "read a set of doubles" ! readDoubleSet ^
-                            end ^
-  "The map value reader should" ^
-    "read a string map" ! readStringStringMap ^
-    "read an boolean map" ! readStringBooleanMap ^
-    "read an int map" ! readStringIntMap ^
-    "read a long map" ! readStringLongMap ^
-    "read a double map" ! readStringDoubleMap ^
-                        end ^
-  "The array value reader should" ^
-    "read an array" ! readStringArray ^
-                    end ^
-   "The indexed seq value reader should" ^
-    "read an indexed seq" ! readStringIndexedSeq ^
-                          end ^
-   "The iterable value reader should" ^
-    "read an iterable" ! readStringIterable ^
-                        end ^
-   "The vector value reader should" ^
-    "read a vector" ! readStringVector ^
-                    end
+  "The collection value readers should" ^
+    "read a list" ! readList ^
+    "read a set" ! readSet ^
+    "read an array" ! readArray ^
+    "read an indexed sequence" ! readIndexedSeq ^
+    "read a vector" ! readVector ^
+    "read an iterable" ! readIterable
 
-  def readStringList = {
-    val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c"]""")
-    delegatingListValueReader[String].read(cfg, "myValue") must beEqualTo(List("a", "b", "c"))
+  import CollectionReaderSpec._
+
+  def readList = readCollection[List]
+
+  def readSet = readCollection[Set]
+
+  def readArray = readCollection[Array]
+
+  def readIndexedSeq = readCollection[IndexedSeq]
+
+  def readVector = readCollection[Vector]
+
+  def readIterable = {
+    implicit def iterableSerializer[A: ConfigSerializer]: ConfigSerializer[Iterable[A]] = ConfigSerializer.iterableSerializer
+    readCollection[Iterable]
   }
 
-  def readBooleanList = {
-    val cfg = ConfigFactory.parseString("myValue = [true, false, true]")
-    delegatingListValueReader[Boolean].read(cfg, "myValue") must beEqualTo(List(true, false, true))
+  protected def readCollection[C[_]](implicit BS: Buildable[String, C], SS: ConfigSerializer[C[String]], RS: ValueReader[C[String]],
+                                     BB: Buildable[Boolean, C], SB: ConfigSerializer[C[Boolean]], RB: ValueReader[C[Boolean]],
+                                     BI: Buildable[Int, C], SI: ConfigSerializer[C[Int]], RI: ValueReader[C[Int]],
+                                     BL: Buildable[Long, C], SL: ConfigSerializer[C[Long]], RL: ValueReader[C[Long]],
+                                     BD: Buildable[Double, C], SD: ConfigSerializer[C[Double]], RD: ValueReader[C[Double]]) = {
+
+    val readsStrings = prop { strings: C[String] =>
+      val cfg = ConfigFactory.parseString("myValue = " + strings.asConfigValue)
+      RS.read(cfg, "myValue") must beEqualTo(strings)
+    }
+
+    val readsBooleans = prop { booleans: C[Boolean] =>
+      val cfg = ConfigFactory.parseString("myValue = " + booleans.asConfigValue)
+      RB.read(cfg, "myValue") must beEqualTo(booleans)
+    }
+
+    val readsInts = prop { ints: C[Int] =>
+      val cfg = ConfigFactory.parseString("myValue = " + ints.asConfigValue)
+      RI.read(cfg, "myValue") must beEqualTo(ints)
+    }
+
+    val readsLongs = prop { longs: C[Long] =>
+      val cfg = ConfigFactory.parseString("myValue = " + longs.asConfigValue)
+      RL.read(cfg, "myValue") must beEqualTo(longs)
+    }
+
+    val readsDoubles = prop { doubles: C[Double] =>
+      val cfg = ConfigFactory.parseString("myValue = " + doubles.asConfigValue)
+      RD.read(cfg, "myValue") must beEqualTo(doubles)
+    }
+
+    readsStrings and readsBooleans and readsInts and readsLongs and readsDoubles
   }
 
-  def readIntList = {
-    val cfg = ConfigFactory.parseString("myValue = [1, 2, 3]")
-    delegatingListValueReader[Int].read(cfg, "myValue") must beEqualTo(List(1, 2, 3))
+}
+
+object CollectionReaderSpec {
+  import scala.collection._
+
+  implicit def buildableIndexedSeq[T]: Buildable[T, IndexedSeq] = new Buildable[T, IndexedSeq] {
+    def builder = IndexedSeq.newBuilder[T]
   }
 
-  def readLongList = {
-    val cfg = ConfigFactory.parseString("myValue = [2147483648, 2, 3]")
-    delegatingListValueReader[Long].read(cfg, "myValue") must beEqualTo(List(2147483648L, 2, 3))
+  implicit def buildableVector[T]: Buildable[T, Vector] = new Buildable[T, Vector] {
+    def builder = Vector.newBuilder[T]
   }
 
-  def readDoubleList = {
-    val cfg = ConfigFactory.parseString("myValue = [0.1, 2.3, 3.4]")
-    delegatingListValueReader[Double].read(cfg, "myValue") must beEqualTo(List(0.1, 2.3, 3.4))
+  implicit def buildableIterable[T]: Buildable[T, Iterable] = new Buildable[T, Iterable] {
+    def builder = new mutable.ListBuffer[T]
   }
-
-  def readStringSet = {
-    val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c", "c"]""")
-    delegatingSetValueReader[String].read(cfg, "myValue") must beEqualTo(Set("a", "b", "c"))
-  }
-
-  def readBooleanSet = {
-    val cfg = ConfigFactory.parseString("myValue = [true, false, true]")
-    delegatingSetValueReader[Boolean].read(cfg, "myValue") must beEqualTo(Set(true, false))
-  }
-
-  def readIntSet = {
-    val cfg = ConfigFactory.parseString("myValue = [1, 2, 3, 3]")
-    delegatingSetValueReader[Int].read(cfg, "myValue") must beEqualTo(Set(1, 2, 3))
-  }
-
-  def readLongSet = {
-    val cfg = ConfigFactory.parseString("myValue = [2147483648, 2, 3]")
-    delegatingSetValueReader[Long].read(cfg, "myValue") must beEqualTo(Set(2147483648L, 2, 3))
-  }
-
-  def readDoubleSet = {
-    val cfg = ConfigFactory.parseString("myValue = [0.1, 2.3, 3.4]")
-    delegatingSetValueReader[Double].read(cfg, "myValue") must beEqualTo(Set(0.1, 2.3, 3.4))
-  }
-
-  def readStringStringMap = {
-    val cfg = ConfigFactory.parseString(
-      """
-        |myValue {
-        |  item1 = "value1"
-        |  item2 = "value2"
-        |}
-      """.stripMargin)
-    delegatingMapValueReader[String].read(cfg, "myValue") must beEqualTo(Map("item1" -> "value1", "item2" -> "value2"))
-  }
-
-  def readStringBooleanMap = {
-    val cfg = ConfigFactory.parseString(
-      """
-        |myValue {
-        |  item1 = true
-        |  item2 = false
-        |}
-      """.stripMargin)
-    delegatingMapValueReader[Boolean].read(cfg, "myValue") must beEqualTo(Map("item1" -> true, "item2" -> false))
-  }
-
-  def readStringIntMap = {
-    val cfg = ConfigFactory.parseString(
-      """
-        |myValue {
-        |  item1 = 0
-        |  item2 = 2
-        |}
-      """.stripMargin)
-    delegatingMapValueReader[Int].read(cfg, "myValue") must beEqualTo(Map("item1" -> 0, "item2" -> 2))
-  }
-
-  def readStringLongMap = {
-    val cfg = ConfigFactory.parseString(
-      """
-        |myValue {
-        |  item1 = 0
-        |  item2 = 2147483648
-        |}
-      """.stripMargin)
-    delegatingMapValueReader[Long].read(cfg, "myValue") must beEqualTo(Map("item1" -> 0L, "item2" -> 2147483648L))
-  }
-
-  def readStringDoubleMap = {
-    val cfg = ConfigFactory.parseString(
-      """
-        |context {
-        |  myValue {
-        |    item1 = 0.0
-        |    item2 = 1.03
-        |  }
-        |}
-      """.stripMargin)
-    delegatingMapValueReader[Double].read(cfg, "context.myValue") must beEqualTo(Map("item1" -> 0.0, "item2" -> 1.03))
-  }
-
-  def readStringArray = {
-    val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c"]""")
-    delegatingArrayReader[String].read(cfg, "myValue") must beEqualTo(Array("a", "b", "c"))
-  }
-
-  def readStringIndexedSeq = {
-    val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c"]""")
-    delegatingIndexedSeqReader[String].read(cfg, "myValue") must beEqualTo(IndexedSeq("a", "b", "c"))
-  }
-
-  def readStringIterable = {
-    val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c"]""")
-    delegatingIterableReader[String].read(cfg, "myValue") must beEqualTo(Iterable("a", "b", "c"))
-  }
-
-  def readStringVector = {
-    val cfg = ConfigFactory.parseString("""myValue = ["a", "b", "c"]""")
-    delegatingVectorReader[String].read(cfg, "myValue") must beEqualTo(Vector("a", "b", "c"))
-  }
-
 }
