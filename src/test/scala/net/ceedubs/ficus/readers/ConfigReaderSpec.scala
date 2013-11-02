@@ -7,13 +7,13 @@ class ConfigReaderSpec extends Spec with ConfigReader with AnyValReaders { def i
   "The Config value reader should" ^
     "read a config" ! readConfig
 
-  def readConfig = {
+  def readConfig = prop { i: Int =>
     val cfg = ConfigFactory.parseString(
-      """
+      s"""
         |myConfig {
-        |  myValue = true
+        |  myValue = $i
         |}
       """.stripMargin)
-    configValueReader.read(cfg, "myConfig").getBoolean("myValue") must beTrue
+    configValueReader.read(cfg, "myConfig").getInt("myValue") must beEqualTo(i)
   }
 }
