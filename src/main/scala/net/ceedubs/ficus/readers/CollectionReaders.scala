@@ -1,6 +1,6 @@
 package net.ceedubs.ficus.readers
 
-import com.typesafe.config.Config
+import com.typesafe.config.{ConfigUtil, Config}
 import collection.JavaConverters._
 import scala.reflect.ClassTag
 
@@ -26,7 +26,7 @@ trait CollectionReaders {
     def read(config: Config, path: String): Map[String, A] = {
       config.getConfig(path).root().entrySet().asScala map { entry =>
         val key = entry.getKey
-        key -> entryReader.read(config, s"$path." + '"' + key + '"')
+        key -> entryReader.read(config, ConfigUtil.joinPath(path, key))
       } toMap
     }
   }

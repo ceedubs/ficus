@@ -10,7 +10,7 @@ class StringReaderSpec extends Spec with StringReader { def is = s2"""
     read a String $readString
   """
 
-  def readString = Prop.forAll(jsonStringValue) { string: String =>
+  def readString = prop { string: String =>
     val cfg = ConfigFactory.parseString(s"myValue = ${string.asConfigValue}")
     stringValueReader.read(cfg, "myValue") must beEqualTo(string)
   }

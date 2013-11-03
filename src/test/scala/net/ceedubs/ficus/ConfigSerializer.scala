@@ -1,5 +1,7 @@
 package net.ceedubs.ficus
 
+import com.typesafe.config.ConfigUtil
+
 trait ConfigSerializer[A] {
   def serialize(a: A): String
 }
@@ -16,7 +18,7 @@ object ConfigSerializer {
     s"[${elements.mkString(", ")}]"
   }
 
-  implicit val stringSerializer = apply[String](s => "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\"")
+  implicit val stringSerializer = apply[String](ConfigUtil.quoteString)
   implicit val booleanSerializer = fromToString[Boolean]
   implicit val intSerializer = fromToString[Int]
   implicit val longSerializer = fromToString[Long]
@@ -33,7 +35,7 @@ object ConfigSerializer {
 
   implicit def stringKeyMapSerializer[A](implicit valueSerializer: ConfigSerializer[A]) = new ConfigSerializer[Map[String, A]] {
     def serialize(map: Map[String, A]): String = {
-      val lines = map.toIterable.map(Function.tupled((key, value) => s"${stringSerializer.serialize(key)}  = ${valueSerializer.serialize(value)}"))
+      val lines = map.toIterable.map(Function.tupled((key, value) => s"${stringSerializer.serialize(key)} = ${valueSerializer.serialize(value)}"))
       s"{\n  ${lines.mkString("\n  ")}\n}"
     }
   }
