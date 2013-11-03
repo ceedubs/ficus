@@ -56,7 +56,7 @@ object ArbitraryTypeReaderMacros {
 
     val instantiationMethod = applyMethod getOrElse {
       val primaryConstructor = returnType.declaration(nme.CONSTRUCTOR) match {
-        case t: TermSymbol => t.alternatives.collectFirst {
+        case t: TermSymbol => t.alternatives collectFirst {
           case m: MethodSymbol if m.isPrimaryConstructor => m
         }
         case _ => None
@@ -65,8 +65,6 @@ object ArbitraryTypeReaderMacros {
         fail(s"it has no apply method in a companion object that return type $returnType, and it doesn't have a constructor")
       }
     }
-
-//    if (!(instantiationMethod.returnType <:< tpe)) fail(s"the method $instantiationMethod returns type ${instantiationMethod.returnType} instead of $tpe")
 
     val instantiationArgs = extractMethodArgsFromConfig[T](c)(method = instantiationMethod,
       companionObjectMaybe = companionSymbol, config = config, path = path, fail = fail)
