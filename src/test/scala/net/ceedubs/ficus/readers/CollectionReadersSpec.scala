@@ -18,6 +18,7 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
     read a vector ${readCollection[Vector]}
     read an iterable $readIterable
     read a map with strings as keys $readStringMap
+    read a map nested in another object $readNestedMap
   """
 
   def readIterable = {
@@ -32,6 +33,19 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
     }
 
     reads[String] and reads[Boolean] and reads[Int] and reads[Long] and reads[Double]
+  }
+
+  def readNestedMap = {
+    val cfg = ConfigFactory.parseString(
+      """
+        |wrapper {
+        |  myValue {
+        |    item1 = "value1"
+        |    item2 = "value2"
+        |  }
+        |}
+      """.stripMargin)
+    delegatingMapValueReader[String].read(cfg, "wrapper.myValue") must beEqualTo(Map("item1" -> "value1", "item2" -> "value2"))
   }
 
   protected def readCollection[C[_]](implicit BS: Buildable[String, C], SS: ConfigSerializer[C[String]], RS: ValueReader[C[String]],

@@ -24,9 +24,10 @@ trait CollectionReaders {
 
   implicit def delegatingMapValueReader[A](implicit entryReader: ValueReader[A]): ValueReader[Map[String, A]] = new ValueReader[Map[String, A]] {
     def read(config: Config, path: String): Map[String, A] = {
-      config.getConfig(path).root().entrySet().asScala map { entry =>
+      val relativeConfig = config.getConfig(path)
+      relativeConfig.root().entrySet().asScala map { entry =>
         val key = entry.getKey
-        key -> entryReader.read(config, ConfigUtil.joinPath(path, key))
+        key -> entryReader.read(relativeConfig, ConfigUtil.quoteString(key))
       } toMap
     }
   }
