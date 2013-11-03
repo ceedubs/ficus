@@ -12,6 +12,7 @@ class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
     instantiate with a multi-param apply method $instantiateMultiParamApply
     instantiate with no apply method but a single constructor with multiple params $instantiateMultiParamConstructor
     instantiate with multiple apply methods if only one returns the correct type $multipleApply
+    instantiate with primary constructor when no apply methods and multiple constructors $multipleConstructors
     use another implicit value reader for a field $withOptionField
     fall back to a default value on an apply method $fallBackToApplyMethodDefaultValue
     fall back to default values on an apply method if base key isn't in config $fallBackToApplyMethodDefaultValueNoKey
@@ -60,6 +61,12 @@ class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
   def multipleApply = prop { foo: String =>
     val cfg = ConfigFactory.parseString(s"withMultipleApply { foo = ${foo.asConfigValue} }")
     val instance: WithMultipleApplyMethods = arbitraryTypeValueReader[WithMultipleApplyMethods].read(cfg, "withMultipleApply")
+    instance.foo must_== foo
+  }
+
+  def multipleConstructors = prop { foo: String =>
+    val cfg = ConfigFactory.parseString(s"withMultipleConstructors { foo = ${foo.asConfigValue} }")
+    val instance: ClassWithMultipleConstructors = arbitraryTypeValueReader[ClassWithMultipleConstructors].read(cfg, "withMultipleConstructors")
     instance.foo must_== foo
   }
 
@@ -178,4 +185,9 @@ object ArbitraryTypeReaderSpec {
       }
     }
   }
+
+  class ClassWithMultipleConstructors(val foo: String) {
+    def this(fooInt: Int) = this(fooInt.toString)
+  }
+
 }

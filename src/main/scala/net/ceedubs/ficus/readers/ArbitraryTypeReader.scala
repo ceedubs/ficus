@@ -55,16 +55,14 @@ object ArbitraryTypeReaderMacros {
     }
 
     val instantiationMethod = applyMethod getOrElse {
-      val constructors = returnType.declaration(nme.CONSTRUCTOR) match {
-        case t: TermSymbol => t.alternatives.collect {
-          case m: MethodSymbol => m
+      val primaryConstructor = returnType.declaration(nme.CONSTRUCTOR) match {
+        case t: TermSymbol => t.alternatives.collectFirst {
+          case m: MethodSymbol if m.isPrimaryConstructor => m
         }
-        case _ => Nil
+        case _ => None
       }
-      constructors match {
-        case Nil => fail(s"it has no apply method in a companion object that return type $returnType, and it doesn't have a constructor")
-        case (head :: Nil) => head
-        case _ => fail(s"it has no apply method in a companion object that return type $returnType, and it has multiple constructors")
+      primaryConstructor getOrElse {
+        fail(s"it has no apply method in a companion object that return type $returnType, and it doesn't have a constructor")
       }
     }
 
