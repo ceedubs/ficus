@@ -14,7 +14,9 @@ class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
     instantiate with multiple apply methods if only one returns the correct type $multipleApply
     use another implicit value reader for a field $withOptionField
     fall back to a default value on an apply method $fallBackToApplyMethodDefaultValue
+    fall back to default values on an apply method if base key isn't in config $fallBackToApplyMethodDefaultValueNoKey
     fall back to a default value on a constructor arg $fallBackToConstructorDefaultValue
+    fall back to a default values on a constructor if base key isn't in config $fallBackToConstructorDefaultValueNoKey
     ignore a default value on an apply method if a value is in config $ignoreApplyParamDefault
     ignore a default value in a constructor if a value is in config $ignoreConstructorParamDefault
   """
@@ -66,8 +68,18 @@ class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
     arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
   }
 
+  def fallBackToApplyMethodDefaultValueNoKey = {
+    val cfg = ConfigFactory.parseString("")
+    arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
+  }
+
   def fallBackToConstructorDefaultValue = {
     val cfg = ConfigFactory.parseString("withDefault { }")
+    arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
+  }
+
+  def fallBackToConstructorDefaultValueNoKey = {
+    val cfg = ConfigFactory.parseString("")
     arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
   }
 
