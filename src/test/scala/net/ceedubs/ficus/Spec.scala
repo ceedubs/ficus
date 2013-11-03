@@ -14,5 +14,5 @@ object Spec {
 
   private[this] val JsonStringChars = ('\u0020' to '\u007E').filterNot(SpecialJsonCharacters.contains)
 
-  val jsonStringValue: Gen[String] = Gen.listOf(JsonStringChars).map(_.mkString)
+  val jsonStringValue: Gen[String] = Gen.someOf(JsonStringChars).map(_.mkString)
 }
