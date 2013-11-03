@@ -30,6 +30,14 @@ object ConfigSerializer {
     serializeIterable(array.toIterable)
   }
   def iterableSerializer[A: ConfigSerializer]: ConfigSerializer[Iterable[A]] = apply[Iterable[A]](serializeIterable)
+
+  implicit def stringKeyMapSerializer[A](implicit valueSerializer: ConfigSerializer[A]) = new ConfigSerializer[Map[String, A]] {
+    def serialize(map: Map[String, A]): String = {
+      val lines = map.toIterable.map(Function.tupled((key, value) => s"${stringSerializer.serialize(key)}  = ${valueSerializer.serialize(value)}"))
+      s"{\n  ${lines.mkString("\n  ")}\n}"
+    }
+  }
+
 }
 
 final case class ConfigSerializerOps[A](a: A, serializer: ConfigSerializer[A]) {

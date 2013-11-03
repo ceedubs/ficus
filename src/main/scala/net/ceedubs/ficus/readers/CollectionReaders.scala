@@ -26,7 +26,7 @@ trait CollectionReaders {
     def read(config: Config, path: String): Map[String, A] = {
       config.getConfig(path).root().entrySet().asScala map { entry =>
         val key = entry.getKey
-        key -> entryReader.read(config, s"$path.$key")
+        key -> entryReader.read(config, s"$path." + '"' + key + '"')
       } toMap
     }
   }

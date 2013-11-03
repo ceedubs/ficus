@@ -6,32 +6,32 @@ import AnyValReaders.{booleanValueReader, doubleValueReader, intValueReader, lon
 import StringReader.stringValueReader
 import ConfigSerializerOps._
 import org.scalacheck.util.Buildable
+import org.scalacheck.Arbitrary
+import CollectionReaderSpec._
 
 class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
   The collection value readers should
-    read a list $readList
-    read a set $readSet
-    read an array $readArray
-    read an indexed sequence $readIndexedSeq
-    read a vector $readVector
+    read a list ${readCollection[List]}
+    read a set ${readCollection[Set]}
+    read an array ${readCollection[Array]}
+    read an indexed sequence ${readCollection[IndexedSeq]}
+    read a vector ${readCollection[Vector]}
     read an iterable $readIterable
+    read a map with strings as keys $readStringMap
   """
-
-  import CollectionReaderSpec._
-
-  def readList = readCollection[List]
-
-  def readSet = readCollection[Set]
-
-  def readArray = readCollection[Array]
-
-  def readIndexedSeq = readCollection[IndexedSeq]
-
-  def readVector = readCollection[Vector]
 
   def readIterable = {
     implicit def iterableSerializer[A: ConfigSerializer]: ConfigSerializer[Iterable[A]] = ConfigSerializer.iterableSerializer
     readCollection[Iterable]
+  }
+
+  def readStringMap = {
+    def reads[A: Arbitrary : ValueReader: ConfigSerializer] = prop { map: Map[String, A] =>
+      val cfg = ConfigFactory.parseString(s"myValue = ${map.asConfigValue}")
+      delegatingMapValueReader[A].read(cfg, "myValue") must beEqualTo(map)
+    }
+
+    reads[String] and reads[Boolean] and reads[Int] and reads[Long] and reads[Double]
   }
 
   protected def readCollection[C[_]](implicit BS: Buildable[String, C], SS: ConfigSerializer[C[String]], RS: ValueReader[C[String]],
@@ -40,32 +40,14 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
                                      BL: Buildable[Long, C], SL: ConfigSerializer[C[Long]], RL: ValueReader[C[Long]],
                                      BD: Buildable[Double, C], SD: ConfigSerializer[C[Double]], RD: ValueReader[C[Double]]) = {
 
-    val readsStrings = prop { strings: C[String] =>
-      val cfg = ConfigFactory.parseString("myValue = " + strings.asConfigValue)
-      RS.read(cfg, "myValue") must beEqualTo(strings)
+    def reads[V](implicit arb: Arbitrary[C[V]], serializer: ConfigSerializer[C[V]], reader: ValueReader[C[V]]) = {
+      prop { values: C[V] =>
+        val cfg = ConfigFactory.parseString(s"myValue = ${values.asConfigValue}")
+        reader.read(cfg, "myValue") must beEqualTo(values)
+      }
     }
 
-    val readsBooleans = prop { booleans: C[Boolean] =>
-      val cfg = ConfigFactory.parseString("myValue = " + booleans.asConfigValue)
-      RB.read(cfg, "myValue") must beEqualTo(booleans)
-    }
-
-    val readsInts = prop { ints: C[Int] =>
-      val cfg = ConfigFactory.parseString("myValue = " + ints.asConfigValue)
-      RI.read(cfg, "myValue") must beEqualTo(ints)
-    }
-
-    val readsLongs = prop { longs: C[Long] =>
-      val cfg = ConfigFactory.parseString("myValue = " + longs.asConfigValue)
-      RL.read(cfg, "myValue") must beEqualTo(longs)
-    }
-
-    val readsDoubles = prop { doubles: C[Double] =>
-      val cfg = ConfigFactory.parseString("myValue = " + doubles.asConfigValue)
-      RD.read(cfg, "myValue") must beEqualTo(doubles)
-    }
-
-    readsStrings and readsBooleans and readsInts and readsLongs and readsDoubles
+    reads[String] and reads[Boolean] and reads[Int] and reads[Long] and reads[Double]
   }
 
 }
