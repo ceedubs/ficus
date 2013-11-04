@@ -3,13 +3,26 @@ package net.ceedubs.ficus.readers
 import com.typesafe.config.Config
 
 /** Reads a value of type A that is located at a provided `path` in a Config. */
-trait ValueReader[A] {
+trait ValueReader[A] { self =>
 
   /** Reads the value at the path `path` in the Config */
   def read(config: Config, path: String): A
+
+  /**
+   * Turns a ValueReader[A] into a ValueReader[B] by applying the provided transformation `f` on the item of type A
+   * that is read from config
+   */
+  def map[B](f: A => B): ValueReader[B] = new ValueReader[B] {
+    def read(config: Config, path: String): B = f(self.read(config, path))
+  }
 }
 
 object ValueReader {
+
+  /** Returns the implicit ValueReader[A] in scope.
+    * `ValueReader[A]` is equivalent to `implicitly[ValueReader[A]]`
+    */
+  def apply[A](implicit reader: ValueReader[A]): ValueReader[A] = reader
 
   /** ValueReader that receives a Config whose root is the path being read.
     *
