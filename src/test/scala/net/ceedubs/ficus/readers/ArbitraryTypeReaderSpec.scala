@@ -2,8 +2,9 @@ package net.ceedubs.ficus
 package readers
 
 import com.typesafe.config.ConfigFactory
-import FicusConfig._
+import ArbitraryTypeReader._
 import ConfigSerializerOps._
+import shapeless.test.illTyped
 
 class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
   An arbitrary type reader should
@@ -20,23 +21,27 @@ class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
     fall back to a default values on a constructor if base key isn't in config $fallBackToConstructorDefaultValueNoKey
     ignore a default value on an apply method if a value is in config $ignoreApplyParamDefault
     ignore a default value in a constructor if a value is in config $ignoreConstructorParamDefault
+    not choose between multiple Java constructors $notChooseBetweenJavaConstructors
   """
 
   import ArbitraryTypeReaderSpec._
 
   def instantiateSingleParamApply = prop { foo2: String =>
+    import FicusConfig.stringValueReader
     val cfg = ConfigFactory.parseString(s"simple { foo2 = ${foo2.asConfigValue} }")
     val instance: WithSimpleCompanionApply = arbitraryTypeValueReader[WithSimpleCompanionApply].read(cfg, "simple")
     instance.foo must_== foo2
   }
 
   def instantiateSingleParamConstructor = prop { foo: String =>
+    import FicusConfig.stringValueReader
     val cfg = ConfigFactory.parseString(s"singleParam { foo = ${foo.asConfigValue} }")
     val instance: ClassWithSingleParam = arbitraryTypeValueReader[ClassWithSingleParam].read(cfg, "singleParam")
     instance.getFoo must_== foo
   }
 
   def instantiateMultiParamApply = prop { (foo: String, bar: Int) =>
+    import FicusConfig.{intValueReader, stringValueReader}
     val cfg = ConfigFactory.parseString(
       s"""
         |multi {
@@ -48,6 +53,7 @@ class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
   }
 
   def instantiateMultiParamConstructor = prop { (foo: String, bar: Int) =>
+    import FicusConfig.{intValueReader, stringValueReader}
     val cfg = ConfigFactory.parseString(
       s"""
         |multi {
@@ -59,50 +65,69 @@ class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
   }
 
   def multipleApply = prop { foo: String =>
+    import FicusConfig.stringValueReader
     val cfg = ConfigFactory.parseString(s"withMultipleApply { foo = ${foo.asConfigValue} }")
     val instance: WithMultipleApplyMethods = arbitraryTypeValueReader[WithMultipleApplyMethods].read(cfg, "withMultipleApply")
     instance.foo must_== foo
   }
 
   def multipleConstructors = prop { foo: String =>
+    import FicusConfig.stringValueReader
     val cfg = ConfigFactory.parseString(s"withMultipleConstructors { foo = ${foo.asConfigValue} }")
     val instance: ClassWithMultipleConstructors = arbitraryTypeValueReader[ClassWithMultipleConstructors].read(cfg, "withMultipleConstructors")
     instance.foo must_== foo
   }
 
   def fallBackToApplyMethodDefaultValue = {
+    import FicusConfig.stringValueReader
     val cfg = ConfigFactory.parseString("withDefault { }")
     arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
   }
 
   def fallBackToApplyMethodDefaultValueNoKey = {
+    import FicusConfig.stringValueReader
     val cfg = ConfigFactory.parseString("")
     arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
   }
 
   def fallBackToConstructorDefaultValue = {
+    import FicusConfig.stringValueReader
     val cfg = ConfigFactory.parseString("withDefault { }")
     arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
   }
 
   def fallBackToConstructorDefaultValueNoKey = {
+    import FicusConfig.stringValueReader
     val cfg = ConfigFactory.parseString("")
     arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
   }
 
   def withOptionField = {
+    import FicusConfig.{optionValueReader, stringValueReader}
     val cfg = ConfigFactory.parseString("""withOption { option = "here" }""")
     arbitraryTypeValueReader[WithOption].read(cfg, "withOption").option must_== Some("here")
   }
 
   def ignoreApplyParamDefault = prop { foo: String =>
+    import FicusConfig.stringValueReader
     val cfg = ConfigFactory.parseString(s"withDefault { foo = ${foo.asConfigValue} }")
     arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== foo
   }
 
   def ignoreConstructorParamDefault = prop { foo: String =>
+    import FicusConfig.stringValueReader
     val cfg = ConfigFactory.parseString(s"withDefault { foo = ${foo.asConfigValue} }")
     arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must_== foo
+  }
+
+  def notChooseBetweenJavaConstructors = {
+    illTyped("implicitly[ValueReader[String]]")
+    illTyped("implicitly[ValueReader[Long]]")
+    illTyped("implicitly[ValueReader[Int]]")
+    illTyped("implicitly[ValueReader[Float]]")
+    illTyped("implicitly[ValueReader[Double]]")
+    illTyped("implicitly[ValueReader[Char]]")
+    success // failure would result in compile error
   }
 }
 

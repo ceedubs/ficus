@@ -1,5 +1,6 @@
 package net.ceedubs.ficus.readers
 
+import net.ceedubs.ficus.util.ReflectionUtils
 import com.typesafe.config.Config
 import scala.language.experimental.macros
 import scala.reflect.internal.{StdNames, SymbolTable, Definitions}
@@ -32,39 +33,12 @@ object ArbitraryTypeReaderMacros {
 
     def fail(reason: String) = c.abort(c.enclosingPosition, s"Cannot generate a config value reader for type $returnType, because $reason")
 
-    val returnTypeTypeArgs = returnType match {
-      case TypeRef(_, _, args) => args
-      case _ => Nil
-    }
-
-    if (returnTypeTypeArgs.nonEmpty) fail(s"value readers cannot be auto-generated for types with type parameters. Consider defining your own ValueReader[$returnType]")
-
     val companionSymbol = returnType.typeSymbol.companionSymbol match {
       case NoSymbol => None
       case x => Some(x)
     }
 
-    val applyMethods = companionSymbol.toList.flatMap(_.typeSignatureIn(returnType).members collect {
-      case m: MethodSymbol if m.name.decoded == "apply" && m.returnType <:< returnType => m
-    })
-
-    val applyMethod = applyMethods match {
-      case Nil => None
-      case (head :: Nil) => Some(head)
-      case _ => fail(s"its companion object has multiple apply methods that return type $returnType")
-    }
-
-    val instantiationMethod = applyMethod getOrElse {
-      val primaryConstructor = returnType.declaration(nme.CONSTRUCTOR) match {
-        case t: TermSymbol => t.alternatives collectFirst {
-          case m: MethodSymbol if m.isPrimaryConstructor => m
-        }
-        case _ => None
-      }
-      primaryConstructor getOrElse {
-        fail(s"it has no apply method in a companion object that return type $returnType, and it doesn't have a constructor")
-      }
-    }
+    val instantiationMethod = ReflectionUtils.instantiationMethod[T](c, fail)
 
     val instantiationArgs = extractMethodArgsFromConfig[T](c)(method = instantiationMethod,
       companionObjectMaybe = companionSymbol, config = config, path = path, fail = fail)
