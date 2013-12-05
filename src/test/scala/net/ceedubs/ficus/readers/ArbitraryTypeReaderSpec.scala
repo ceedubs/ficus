@@ -21,6 +21,7 @@ class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
     fall back to a default values on a constructor if base key isn't in config $fallBackToConstructorDefaultValueNoKey
     ignore a default value on an apply method if a value is in config $ignoreApplyParamDefault
     ignore a default value in a constructor if a value is in config $ignoreConstructorParamDefault
+    allow overriding of option reader for default values $overrideOptionReaderForDefault
     not choose between multiple Java constructors $notChooseBetweenJavaConstructors
   """
 
@@ -79,25 +80,25 @@ class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
   }
 
   def fallBackToApplyMethodDefaultValue = {
-    import FicusConfig.stringValueReader
+    import FicusConfig.{optionValueReader, stringValueReader}
     val cfg = ConfigFactory.parseString("withDefault { }")
     arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
   }
 
   def fallBackToApplyMethodDefaultValueNoKey = {
-    import FicusConfig.stringValueReader
+    import FicusConfig.{optionValueReader, stringValueReader}
     val cfg = ConfigFactory.parseString("")
     arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
   }
 
   def fallBackToConstructorDefaultValue = {
-    import FicusConfig.stringValueReader
+    import FicusConfig.{optionValueReader, stringValueReader}
     val cfg = ConfigFactory.parseString("withDefault { }")
     arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
   }
 
   def fallBackToConstructorDefaultValueNoKey = {
-    import FicusConfig.stringValueReader
+    import FicusConfig.{optionValueReader, stringValueReader}
     val cfg = ConfigFactory.parseString("")
     arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must_== "defaultFoo"
   }
@@ -109,15 +110,23 @@ class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
   }
 
   def ignoreApplyParamDefault = prop { foo: String =>
-    import FicusConfig.stringValueReader
+    import FicusConfig.{optionValueReader, stringValueReader}
     val cfg = ConfigFactory.parseString(s"withDefault { foo = ${foo.asConfigValue} }")
     arbitraryTypeValueReader[WithDefault].read(cfg, "withDefault").foo must_== foo
   }
 
   def ignoreConstructorParamDefault = prop { foo: String =>
-    import FicusConfig.stringValueReader
+    import FicusConfig.{optionValueReader, stringValueReader}
     val cfg = ConfigFactory.parseString(s"withDefault { foo = ${foo.asConfigValue} }")
     arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must_== foo
+  }
+
+  def overrideOptionReaderForDefault = {
+    implicit val stringOptionReader: ValueReader[Option[String]] = FicusConfig.stringValueReader map { s =>
+      if (s.isEmpty) None else Some(s)
+    }
+    val cfg = ConfigFactory.parseString("""withDefault { foo = "" }""")
+    arbitraryTypeValueReader[ClassWithDefault].read(cfg, "withDefault").foo must beEqualTo("defaultFoo")
   }
 
   def notChooseBetweenJavaConstructors = {

@@ -63,14 +63,13 @@ object ArbitraryTypeReaderMacros {
       val returnType: Type = param.typeSignatureIn(c.weakTypeOf[T])
       val key = reify(path.splice + "." + nameExpr.splice)
 
-      val readerType = appliedType(weakTypeOf[ValueReader[_]].typeConstructor, List(returnType))
-      val reader = c.inferImplicitValue(readerType, silent = true) match {
-        case EmptyTree => fail(s"an implicit value reader of type $readerType must be in scope to read parameter '$name' on '$decodedMethodName' method")
-        case x => x
-      }
-
       companionObjectMaybe.filter(_ => param.asTerm.isParamWithDefault) map { companionObject =>
-        val optionReader = Apply(Select(reify(OptionReader).tree, newTermName("optionValueReader")), List(reader))
+        val optionType = appliedType(weakTypeOf[Option[_]].typeConstructor, List(returnType))
+        val optionReaderType = appliedType(weakTypeOf[ValueReader[_]].typeConstructor, List(optionType))
+        val optionReader = c.inferImplicitValue(optionReaderType, silent = true) match {
+          case EmptyTree => fail(s"an implicit value reader of type $optionReaderType must be in scope to read parameter '$name' on '$decodedMethodName' method since '$name' has a default value")
+          case x => x
+        }
         val argValueMaybe = readConfigValue(c)(config, key, optionReader)
         Apply(Select(argValueMaybe.tree, newTermName("getOrElse")), List({
           // fall back to default value for param
@@ -79,6 +78,11 @@ object ArbitraryTypeReaderMacros {
           Select(Ident(companionObject), newTermName(getter.encoded))
         }))
       } getOrElse {
+        val readerType = appliedType(weakTypeOf[ValueReader[_]].typeConstructor, List(returnType))
+        val reader = c.inferImplicitValue(readerType, silent = true) match {
+          case EmptyTree => fail(s"an implicit value reader of type $readerType must be in scope to read parameter '$name' on '$decodedMethodName' method")
+          case x => x
+        }
         val argValue = readConfigValue(c)(config, key, reader)
         argValue.tree
       }
