@@ -29,7 +29,7 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
   def readStringMap = {
     def reads[A: Arbitrary : ValueReader: ConfigSerializer] = prop { map: Map[String, A] =>
       val cfg = ConfigFactory.parseString(s"myValue = ${map.asConfigValue}")
-      delegatingMapValueReader[A].read(cfg, "myValue") must beEqualTo(map)
+      mapValueReader[A].read(cfg, "myValue") must beEqualTo(map)
     }
 
     reads[String] and reads[Boolean] and reads[Int] and reads[Long] and reads[Double]
@@ -45,7 +45,7 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
         |  }
         |}
       """.stripMargin)
-    delegatingMapValueReader[String].read(cfg, "wrapper.myValue") must beEqualTo(Map("item1" -> "value1", "item2" -> "value2"))
+    mapValueReader[String].read(cfg, "wrapper.myValue") must beEqualTo(Map("item1" -> "value1", "item2" -> "value2"))
   }
 
   protected def readCollection[C[_]](implicit BS: Buildable[String, C], SS: ConfigSerializer[C[String]], RS: ValueReader[C[String]],
