@@ -9,7 +9,7 @@ trait CollectionReaders {
 
   private[this] val DummyPathValue: String = "collection-entry-path"
 
-  implicit def traversableReaderReader[A, C[_]](implicit entryReader: ValueReader[A], cbf: CanBuildFrom[Nothing, A, C[A]]): ValueReader[C[A]] = new ValueReader[C[A]] {
+  implicit def traversableReader[C[_], A](implicit entryReader: ValueReader[A], cbf: CanBuildFrom[Nothing, A, C[A]]): ValueReader[C[A]] = new ValueReader[C[A]] {
     def read(config: Config, path: String): C[A] = {
       val list = config.getList(path).asScala 
       val builder = cbf()

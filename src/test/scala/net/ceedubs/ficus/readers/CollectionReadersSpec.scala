@@ -19,6 +19,7 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
     read an iterable $readIterable
     read a map with strings as keys $readStringMap
     read a map nested in another object $readNestedMap
+    read a collection when used directly $readCollectionUsedDirectly
   """
 
   def readIterable = {
@@ -62,6 +63,11 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
     }
 
     reads[String] and reads[Boolean] and reads[Int] and reads[Long] and reads[Double]
+  }
+
+  def readCollectionUsedDirectly = {
+    val cfg = ConfigFactory.parseString("set: [1, 2, 2, 3]")
+    traversableReader[Set, Int].read(cfg, "set") must beEqualTo(Set(1, 2, 3))
   }
 
 }
