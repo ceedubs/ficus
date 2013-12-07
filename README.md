@@ -52,7 +52,7 @@ Out of the box, Ficus can read most types from config:
 * Primitives (`Boolean`, `Int`, `Long`, `Double`)
 * `String`
 * `Option[A]`
-* Collections (`List[A]`, `Set[A]`, `Map[String, A]`, `Array[A]`, `IndexedSeq[A]`, `Iterable[A]`, `Vector[A]`)
+* Collections (`List[A]`, `Set[A]`, `Map[String, A]`, `Array[A]`, etc. All types with a CanBuildFrom instance are supported)
 * `Config` (Typesafe config)
 * `FiniteDuration`
 * Most arbitrary classes (as well as traits that have an apply method for instantiation). See [Arbitrary type support](#arbitrary-type-support)
