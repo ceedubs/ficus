@@ -11,7 +11,7 @@ trait CollectionReaders {
 
   implicit def traversableReader[C[_], A](implicit entryReader: ValueReader[A], cbf: CanBuildFrom[Nothing, A, C[A]]): ValueReader[C[A]] = new ValueReader[C[A]] {
     def read(config: Config, path: String): C[A] = {
-      val list = config.getList(path).asScala 
+      val list = config.getList(path).asScala
       val builder = cbf()
       builder.sizeHint(list.size)
       list foreach { entry =>
