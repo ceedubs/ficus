@@ -13,7 +13,7 @@ trait DurationReaders {
    */
   implicit def finiteDurationReader: ValueReader[FiniteDuration] = new ValueReader[FiniteDuration] {
     def read(config: Config, path: String): FiniteDuration = {
-      val millis = config.getMilliseconds(path)
+      val millis = config.getDuration(path, java.util.concurrent.TimeUnit.MILLISECONDS)
       FiniteDuration(millis, MILLISECONDS)
     }
   }
