@@ -1,6 +1,6 @@
 package net.ceedubs.ficus.util
 
-import scala.reflect.macros.Context
+import scala.reflect.macros.blackbox.Context
 
 object ReflectionUtils {
   def instantiationMethod[T : c.WeakTypeTag](c: Context, fail: String => Nothing): c.universe.MethodSymbol = {
@@ -15,13 +15,13 @@ object ReflectionUtils {
 
     if (returnTypeTypeArgs.nonEmpty) fail(s"value readers cannot be auto-generated for types with type parameters. Consider defining your own ValueReader[$returnType]")
 
-    val companionSymbol = returnType.typeSymbol.companionSymbol match {
+    val companionSymbol = returnType.typeSymbol.companion match {
       case NoSymbol => None
       case x => Some(x)
     }
 
     val applyMethods = companionSymbol.toList.flatMap(_.typeSignatureIn(returnType).members collect {
-      case m: MethodSymbol if m.name.decoded == "apply" && m.returnType <:< returnType => m
+      case m: MethodSymbol if m.name.decodedName.toString == "apply" && m.returnType <:< returnType => m
     })
 
     val applyMethod = applyMethods match {
@@ -31,7 +31,7 @@ object ReflectionUtils {
     }
 
     applyMethod getOrElse {
-      val primaryConstructor = returnType.declaration(nme.CONSTRUCTOR) match {
+      val primaryConstructor = returnType.decl(termNames.CONSTRUCTOR) match {
         case t: TermSymbol => {
           val constructors = t.alternatives collect {
             case m: MethodSymbol if m.isConstructor => m

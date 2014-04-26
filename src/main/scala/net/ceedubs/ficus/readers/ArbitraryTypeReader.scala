@@ -12,7 +12,7 @@ trait ArbitraryTypeReader {
 object ArbitraryTypeReader extends ArbitraryTypeReader
 
 object ArbitraryTypeReaderMacros {
-  import scala.reflect.macros.Context
+  import scala.reflect.macros.blackbox.Context
 
   def arbitraryTypeValueReader[T : c.WeakTypeTag](c: Context): c.Expr[ValueReader[T]] = {
     import c.universe._
@@ -20,8 +20,8 @@ object ArbitraryTypeReaderMacros {
     reify {
       new ValueReader[T] {
         def read(config: Config, path: String): T = instantiateFromConfig[T](c)(
-          config = c.Expr[Config](Ident(newTermName("config"))),
-          path = c.Expr[String](Ident(newTermName("path")))).splice
+          config = c.Expr[Config](Ident(TermName("config"))),
+          path = c.Expr[String](Ident(TermName("path")))).splice
       }
     }
   }
@@ -33,7 +33,7 @@ object ArbitraryTypeReaderMacros {
 
     def fail(reason: String) = c.abort(c.enclosingPosition, s"Cannot generate a config value reader for type $returnType, because $reason")
 
-    val companionSymbol = returnType.typeSymbol.companionSymbol match {
+    val companionSymbol = returnType.typeSymbol.companion match {
       case NoSymbol => None
       case x => Some(x)
     }
@@ -53,15 +53,14 @@ object ArbitraryTypeReaderMacros {
                                               config: c.Expr[Config], path: c.Expr[String], fail: String => Nothing): List[c.Tree] = {
     import c.universe._
 
-    val decodedMethodName = method.name.decoded
+    val decodedMethodName = method.name.decodedName.toString
 
     if (!method.isPublic) fail(s"'$decodedMethodName' method is not public")
 
-    method.paramss.head.zipWithIndex map { case (param, index) =>
-      val name = param.name.decoded
-      val nameExpr = c.literal(name)
+    method.paramLists.head.zipWithIndex map { case (param, index) =>
+      val name = param.name.decodedName.toString
+      val key = q"""$path + "." + $name"""
       val returnType: Type = param.typeSignatureIn(c.weakTypeOf[T])
-      val key = reify(path.splice + "." + nameExpr.splice)
 
       companionObjectMaybe.filter(_ => param.asTerm.isParamWithDefault) map { companionObject =>
         val optionType = appliedType(weakTypeOf[Option[_]].typeConstructor, List(returnType))
@@ -70,12 +69,12 @@ object ArbitraryTypeReaderMacros {
           case EmptyTree => fail(s"an implicit value reader of type $optionReaderType must be in scope to read parameter '$name' on '$decodedMethodName' method since '$name' has a default value")
           case x => x
         }
-        val argValueMaybe = readConfigValue(c)(config, key, optionReader)
-        Apply(Select(argValueMaybe.tree, newTermName("getOrElse")), List({
+        val argValueMaybe = q"$optionReader.read($config, $key)"
+        Apply(Select(argValueMaybe, TermName("getOrElse")), List({
           // fall back to default value for param
           val u = c.universe.asInstanceOf[Definitions with SymbolTable with StdNames]
-          val getter = u.nme.defaultGetterName(u.newTermName(decodedMethodName), index + 1)
-          Select(Ident(companionObject), newTermName(getter.encoded))
+          val getter = u.nme.defaultGetterName(u.TermName(decodedMethodName), index + 1)
+          Select(Ident(companionObject), TermName(getter.encoded))
         }))
       } getOrElse {
         val readerType = appliedType(weakTypeOf[ValueReader[_]].typeConstructor, List(returnType))
@@ -83,15 +82,8 @@ object ArbitraryTypeReaderMacros {
           case EmptyTree => fail(s"an implicit value reader of type $readerType must be in scope to read parameter '$name' on '$decodedMethodName' method")
           case x => x
         }
-        val argValue = readConfigValue(c)(config, key, reader)
-        argValue.tree
+        q"$reader.read($config, $key)"
       }
     }
-  }
-
-  def readConfigValue[T: c.universe.WeakTypeTag](c: Context)(config: c.Expr[Config], path: c.Expr[String], reader: c.Tree): c.Expr[T] = {
-    import c.universe._
-    val readerRead = Select(reader, newTermName("read"))
-    c.Expr[T](Apply(readerRead, List(config.tree, path.tree)))
   }
 }

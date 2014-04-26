@@ -49,11 +49,11 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
     mapValueReader[String].read(cfg, "wrapper.myValue") must beEqualTo(Map("item1" -> "value1", "item2" -> "value2"))
   }
 
-  protected def readCollection[C[_]](implicit BS: Buildable[String, C], SS: ConfigSerializer[C[String]], RS: ValueReader[C[String]],
-                                     BB: Buildable[Boolean, C], SB: ConfigSerializer[C[Boolean]], RB: ValueReader[C[Boolean]],
-                                     BI: Buildable[Int, C], SI: ConfigSerializer[C[Int]], RI: ValueReader[C[Int]],
-                                     BL: Buildable[Long, C], SL: ConfigSerializer[C[Long]], RL: ValueReader[C[Long]],
-                                     BD: Buildable[Double, C], SD: ConfigSerializer[C[Double]], RD: ValueReader[C[Double]]) = {
+  protected def readCollection[C[_]](implicit AS: Arbitrary[C[String]], SS: ConfigSerializer[C[String]], RS: ValueReader[C[String]],
+                                     AB: Arbitrary[C[Boolean]], SB: ConfigSerializer[C[Boolean]], RB: ValueReader[C[Boolean]],
+                                     AI: Arbitrary[C[Int]], SI: ConfigSerializer[C[Int]], RI: ValueReader[C[Int]],
+                                     AL: Arbitrary[C[Long]], SL: ConfigSerializer[C[Long]], RL: ValueReader[C[Long]],
+                                     AD: Arbitrary[C[Double]], SD: ConfigSerializer[C[Double]], RD: ValueReader[C[Double]]) = {
 
     def reads[V](implicit arb: Arbitrary[C[V]], serializer: ConfigSerializer[C[V]], reader: ValueReader[C[V]]) = {
       prop { values: C[V] =>
