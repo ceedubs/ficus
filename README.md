@@ -93,3 +93,9 @@ Arbitrary type support requires Scala 2.10.2 or higher, because it takes advanta
 
 # Custom extraction #
 When you call `as[String]("somePath")`, Ficus config knows how to extract a String because there is an implicit `ValueReader[String]` in scope. If you would like, you can even teach it how to extract a `Foo` from the config using `as[Foo]("fooPath")` if you create your own `ValueReader[Foo]`. You could pass this Foo extractor explicitly to the `as` method, but most likely you just want to make it implicit. For an example of a custom value reader, see the `ValueReader[ServiceConfig]` defined in [ExampleSpec](https://github.com/ceedubs/ficus/blob/master/src/test/scala/net/ceedubs/ficus/ExampleSpec.scala).
+
+# Contributions #
+
+Many thanks to all of [those who have contributed](https://github.com/ceedubs/ficus/blob/develop/CONTRIBUTORS.md) to Ficus.
+
+Would you like to contribute to Ficus? Pull requests are welcome and encouraged! Please note that contributions will be under the [MIT license](https://github.com/ceedubs/ficus/blob/develop/LICENSE). Please provide unit tests along with code contributions.
