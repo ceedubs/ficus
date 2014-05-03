@@ -51,6 +51,8 @@ libraryDependencies += "net.ceedubs" %% "ficus" % "1.1.0"
 ```
 If you want to take advantage of Ficus's ability to automatically hydrate arbitrary traits and classes from configuration, you need to be on Scala version 2.10.2 or higer, because this functionality depends on implicit macros.
 
+Release notes are available on the [Ficus wiki](https://github.com/ceedubs/ficus/wiki).
+
 # Built-in readers #
 Out of the box, Ficus can read most types from config:
 * Primitives (`Boolean`, `Int`, `Long`, `Double`)
