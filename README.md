@@ -98,6 +98,6 @@ When you call `as[String]("somePath")`, Ficus config knows how to extract a Stri
 
 # Contributions #
 
-Many thanks to all of [those who have contributed](https://github.com/ceedubs/ficus/blob/develop/CONTRIBUTORS.md) to Ficus.
+Many thanks to all of [those who have contributed](https://github.com/ceedubs/ficus/blob/master/CONTRIBUTORS.md) to Ficus.
 
-Would you like to contribute to Ficus? Pull requests are welcome and encouraged! Please note that contributions will be under the [MIT license](https://github.com/ceedubs/ficus/blob/develop/LICENSE). Please provide unit tests along with code contributions.
+Would you like to contribute to Ficus? Pull requests are welcome and encouraged! Please note that contributions will be under the [MIT license](https://github.com/ceedubs/ficus/blob/master/LICENSE). Please provide unit tests along with code contributions.
