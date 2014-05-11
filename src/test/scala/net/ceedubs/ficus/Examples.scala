@@ -1,7 +1,8 @@
 package net.ceedubs.ficus
 
 import com.typesafe.config.{Config, ConfigFactory}
-import net.ceedubs.ficus.FicusConfig._
+import net.ceedubs.ficus.Ficus._
+import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 import scala.concurrent.duration.FiniteDuration
 
 case class SomeCaseClass(foo: String, bar: Int, baz: Option[FiniteDuration])

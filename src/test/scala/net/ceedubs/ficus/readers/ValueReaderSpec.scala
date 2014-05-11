@@ -2,7 +2,7 @@ package net.ceedubs.ficus
 package readers
 
 import com.typesafe.config.ConfigFactory
-import FicusConfig.intValueReader
+import Ficus.intValueReader
 
 class ValueReaderSpec extends Spec { def is = s2"""
   A value reader should
