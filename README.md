@@ -46,7 +46,7 @@ resolvers ++= Seq(
 
 Now add the Ficus dependency to your build SBT file as well:
 ```scala
-libraryDependencies += "net.ceedubs" %% "ficus" % "1.0.0"
+libraryDependencies += "net.ceedubs" %% "ficus" % "1.0.1"
 ```
 If you want to take advantage of Ficus's ability to automatically hydrate arbitrary traits and classes from configuration, you need to be on Scala version 2.10.2 or higer, because this functionality depends on implicit macros.
 
