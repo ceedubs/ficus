@@ -2,7 +2,7 @@ package net.ceedubs.ficus
 package readers
 
 import com.typesafe.config.{Config, ConfigFactory}
-import FicusConfig._
+import Ficus._
 
 class ConfigReaderSpec extends Spec { def is = s2"""
   The Config value reader should

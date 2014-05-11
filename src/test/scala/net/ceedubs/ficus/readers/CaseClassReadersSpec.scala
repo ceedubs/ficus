@@ -2,7 +2,8 @@ package net.ceedubs.ficus
 package readers
 
 import com.typesafe.config.ConfigFactory
-import net.ceedubs.ficus.FicusConfig._
+import net.ceedubs.ficus.Ficus._
+import net.ceedubs.ficus.readers.ArbitraryTypeReader._
 import ConfigSerializerOps._
 
 object CaseClassReadersSpec {

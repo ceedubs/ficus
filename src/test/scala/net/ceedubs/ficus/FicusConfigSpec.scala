@@ -1,7 +1,7 @@
 package net.ceedubs.ficus
 
 import com.typesafe.config.ConfigFactory
-import FicusConfig.{ booleanValueReader, optionValueReader, toFicusConfig }
+import Ficus.{ booleanValueReader, optionValueReader, toFicusConfig }
 
 class FicusConfigSpec extends Spec { def is = s2"""
   A Ficus config should
