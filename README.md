@@ -47,7 +47,7 @@ resolvers ++= Seq(
 Now add the Ficus dependency to your build SBT file as well:
 ```scala
 // for Scala 2.10.x
-libraryDependencies += "net.ceedubs" %% "ficus" % "1.0.0"
+libraryDependencies += "net.ceedubs" %% "ficus" % "1.0.1"
 
 // for Scala 2.11.x
 libraryDependencies += "net.ceedubs" %% "ficus" % "1.1.1"
