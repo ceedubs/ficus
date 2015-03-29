@@ -11,6 +11,8 @@ trait FicusConfig {
   def getAs[A](path: String)(implicit reader: ValueReader[Option[A]]): Option[A] = reader.read(config, path)
 
   def apply[A](key: ConfigKey[A])(implicit reader: ValueReader[A]): A = as[A](key.path)
+
+  def getConfig(path: String) = Ficus.toFicusConfig(config.getConfig(path))
 }
 
 final case class SimpleFicusConfig(config: Config) extends FicusConfig
