@@ -25,7 +25,7 @@ trait AnyValReaders {
       try {
         BigDecimal(s)
       } catch {
-        case e:Throwable => throw ConfigException.WrongType
+        case e:Throwable => throw new ConfigException.WrongType(config.origin(),path,"scala.math.BigDecimal","String",e)
       }
     }
   }
@@ -36,7 +36,7 @@ trait AnyValReaders {
       try {
         BigInt(s)
       } catch {
-        case e:Throwable => throw ConfigException.WrongType
+        case e:Throwable => throw new ConfigException.WrongType(config.origin(),path,"scala.math.BigInt","String",e)
       }
     }
   }
