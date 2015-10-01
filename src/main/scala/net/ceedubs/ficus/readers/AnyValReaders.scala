@@ -18,6 +18,14 @@ trait AnyValReaders {
   implicit val doubleValueReader: ValueReader[Double] = new ValueReader[Double] {
     def read(config: Config, path: String): Double = config.getDouble(path)
   }
+  
+  implicit val bigDecimalReader: ValueReader[BigDecimal] = new ValueReader[BigDecimal] {
+    def read(config: Config, path: String): BigDecimal = BigDecimal(config.getString(path))
+  }
+  
+  implicit val bigIntReader: ValueReader[BigInt] = new ValueReader[BigInt] {
+    def read(config: Config, path: String): BigInt = BigInt(config.getString(path))
+  }
 }
 
 object AnyValReaders extends AnyValReaders
