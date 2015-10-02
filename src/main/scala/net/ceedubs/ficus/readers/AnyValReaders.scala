@@ -1,6 +1,6 @@
 package net.ceedubs.ficus.readers
 
-import com.typesafe.config.Config
+import com.typesafe.config.{ConfigException, Config}
 
 trait AnyValReaders {
   implicit val booleanValueReader: ValueReader[Boolean] = new ValueReader[Boolean] {
@@ -18,6 +18,7 @@ trait AnyValReaders {
   implicit val doubleValueReader: ValueReader[Double] = new ValueReader[Double] {
     def read(config: Config, path: String): Double = config.getDouble(path)
   }
+  
 }
 
 object AnyValReaders extends AnyValReaders
