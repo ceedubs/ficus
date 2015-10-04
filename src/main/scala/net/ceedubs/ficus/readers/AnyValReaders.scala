@@ -1,6 +1,6 @@
 package net.ceedubs.ficus.readers
 
-import com.typesafe.config.{ConfigException, Config}
+import com.typesafe.config.Config
 
 trait AnyValReaders {
   implicit val booleanValueReader: ValueReader[Boolean] = new ValueReader[Boolean] {
