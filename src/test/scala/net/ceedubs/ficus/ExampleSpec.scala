@@ -4,9 +4,18 @@ import org.specs2.mutable.Specification
 import com.typesafe.config.{Config, ConfigFactory}
 import Ficus._
 import net.ceedubs.ficus.readers.ArbitraryTypeReader._
+import net.ceedubs.ficus.readers.EnumerationReader._
 import net.ceedubs.ficus.readers.ValueReader
 
 case class ServiceConfig(urls: Set[String], maxConnections: Int, httpsRequired: Boolean = false)
+
+object Country extends Enumeration {
+  val DE = Value("DE")
+  val IT = Value("IT")
+  val NL = Value("NL")
+  val US = Value("US")
+  val GB = Value("GB")
+}
 
 class ExampleSpec extends Specification {
 
@@ -24,6 +33,7 @@ class ExampleSpec extends Specification {
       |    maxConnections = 25
       |  }
       |}
+      |countries = [DE, US, GB]
     """.stripMargin)
 
   "Ficus config" should {
@@ -37,6 +47,8 @@ class ExampleSpec extends Specification {
       analyticsServiceConfig.as[List[String]]("urls") must beEqualTo(List("localhost:8002", "localhost:8003"))
       val analyticsServiceRequiresHttps = analyticsServiceConfig.as[Option[Boolean]]("httpsRequired") getOrElse false
       analyticsServiceRequiresHttps must beFalse
+
+      config.as[Seq[Country.Value]]("countries") must be equalTo Seq(Country.DE, Country.US, Country.GB)
     }
 
     "Automagically be able to hydrate arbitrary types from config" in {

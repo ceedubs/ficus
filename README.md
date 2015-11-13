@@ -12,6 +12,14 @@ Ficus adds an `as[A]` method to a normal [Typesafe Config](http://typesafehub.gi
 ```scala
 import net.ceedubs.ficus.Ficus._
 
+object Country extends Enumeration {
+  val DE = Value("DE")
+  val IT = Value("IT")
+  val NL = Value("NL")
+  val US = Value("US")
+  val GB = Value("GB")
+}
+
 case class SomeCaseClass(foo: String, bar: Int, baz: Option[FiniteDuration])
 
 class Examples {
@@ -28,6 +36,12 @@ class Examples {
 
   // something such as "15 minutes" can be converted to a FiniteDuration
   val retryInterval: FiniteDuration = config.as[FiniteDuration]("retryInterval")
+
+  // can extract arbitrary Enumeration types
+  // Note: it throws an exception at runtime, if the enumeration type cannot be instantiated or 
+  // if a config value cannot be mapped to the enumeration value
+  import net.ceedubs.ficus.readers.EnumerationReader._
+  val someEnumerationType: Seq[Country.Value] = config.as[Seq[Country.Value]]("countries")
 
   // can hydrate most arbitrary types
   // it first tries to use an apply method on the companion object and falls back to the primary constructor
@@ -72,12 +86,15 @@ Out of the box, Ficus can read most types from config:
 * Collections (`List[A]`, `Set[A]`, `Map[String, A]`, `Array[A]`, etc. All types with a CanBuildFrom instance are supported)
 * `Config` and `ConfigValue` (Typesafe config/value)
 * `FiniteDuration`
+* The Scala `Enumeration` type.  See [Enumeration support](#enumeration-support)
 * Most arbitrary classes (as well as traits that have an apply method for instantiation). See [Arbitrary type support](#arbitrary-type-support)
 
 In this context, `A` means any type for which a `ValueReader` is already defined. For example, `Option[String]` is supported out of the box because `String` is. If you want to be able to extract an `Option[Foo[A]]` for some some type `Foo` that doesn't meet the supported type requirements (for example, this `Foo` has a type parameter), the option part is taken care of, but you will need to provide the implementation for extracting a `Foo[A]` from config. See [Custom extraction](#custom-extraction).
 
 # Imports #
 The easiest way to start using Ficus config is to just `import net.ceedubs.ficus.Ficus._` as was done in the Examples section. This will import all of the implicit values you need to start easily grabbing most basic types out of config using the `as` method that will become available on Typesafe `Config` objects.
+
+To enable Ficus's reading of `Enumeration` types, you can also import `net.ceedubs.ficus.readers.EnumerationReader._`. See [Enumeration support](#enumeration-support)
 
 To enable Ficus's macro-based reading of case classes and other types, you can also import `net.ceedubs.ficus.readers.ArbitraryTypeReader._`. See [Arbitrary type support](#arbitrary-type-support)
 
@@ -90,6 +107,31 @@ You will then need a [ValueReader](https://github.com/iheartradio/ficus/blob/mas
 If instead you want to be able to call `as[Option[String]]`, you would need to bring an implicit `ValueReader` for `Option` into scope (via `import net.ceedubs.ficus.FicusConfig.optionValueReader` for example), but then you would also need to bring the `String` value reader into scope as described above, since the `Option` value reader delegates through to the relevant value reader after checking that a config value exists at the given path.
 
 _Don't worry_. It will be obvious if you forgot to bring the right value reader into scope, because the compiler will give you an error.
+
+# Enumeration support #
+Ficus has the ability to parse config values to Scala's `Enumeration` type.
+
+If you have the following enum:
+```scala
+object Country extends Enumeration {
+  val DE = Value("DE")
+  val IT = Value("IT")
+  val NL = Value("NL")
+  val US = Value("US")
+  val GB = Value("GB")
+}
+```
+
+You can define the config like:
+```
+countries = [DE, US, GB]
+```
+
+To get an `Enumeration` type from your config you must import the `EnumerationReader` into your code. Then you can fetch it with the `as` method that Ficus provides on Typesafe `Config` objects.
+```scala
+import net.ceedubs.ficus.readers.EnumerationReader._
+val countries: Seq[Country.Value] = config.as[Seq[Country.Value]]("countries")
+```
 
 # Arbitrary type support #
 
