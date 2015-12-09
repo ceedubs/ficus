@@ -7,7 +7,7 @@ startYear := Some(2013)
 
 
 /* scala versions and options */
-scalaVersion := "2.11.0"
+scalaVersion := "2.11.7"
 
 // These options will be used for *all* versions.
 scalacOptions ++= Seq(
