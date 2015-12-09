@@ -1,3 +1,5 @@
+Official repo for ficus. Adopted from [ceedubs](https://github.com/ceedubs/ficus)
+
 # Ficus #
 Ficus is a lightweight companion to Typesafe config that makes it more Scala-friendly.
 
