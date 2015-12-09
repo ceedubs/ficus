@@ -1,20 +1,9 @@
-# Warning: abandoned project #
-I have been neglecting Ficus for several reasons:
-* At work we use [knobs](http://oncue.github.io/knobs/)
-* I am a bit oversubscribed on open source projects
-* Ficus scratched an itch when I first wrote it, but if I were to write it again right now, I would approach it differently.
-    * I would represent errors explicitly in the types (currently it throws exceptions, which can be handy, but I would want an alternative).
-    * I would use [Shapeless](https://github.com/milessabin/shapeless) to derive readers instead of a macro. At the time, the macro was necessary to use default values on classes, but Shapeless now provides full support for this.
-    * I think I would end up writing a `shapeless-knobs` micro library that simply provides Shapeless-derived [Configured](https://github.com/oncue/knobs/blob/master/core/src/main/scala/knobs/Configured.scala) instances.
-
-Having said that, I know there are a number of people that are happily using Ficus. I'm happy to hand this project off to a good owner. The only difficulty might be in publishing credentials. Since its currently under `net.ceedubs`, the simplest option may be to have a fork and start publishing in a different namespace. I'm happy to update the repo to redirect to the new official project. Please email me at my GitHub handle at gmail if you'd like to volunteer to take over this project.
-
 # Ficus #
 Ficus is a lightweight companion to Typesafe config that makes it more Scala-friendly.
 
 Ficus adds an `as[A]` method to a normal [Typesafe Config](http://typesafehub.github.io/config/latest/api/com/typesafe/config/Config.html) so you can do things like `config.as[Option[Int]]`, `config.as[List[String]]`, or even `config.as[MyClass]`. It is implemented with type classes so that it is easily extensible and many silly mistakes can be caught by the compiler.
 
-[![Build Status](https://secure.travis-ci.org/ceedubs/ficus.png?branch=master)](http://travis-ci.org/ceedubs/ficus)
+[![Build Status](https://secure.travis-ci.org/iheartradio/ficus.png?branch=master)](http://travis-ci.org/iheartradio/ficus)
 
 # Examples #
 ```scala
@@ -50,22 +39,20 @@ For more detailed examples and how they match up with what's defined in a config
 # Adding the dependency #
 You most likely already have the Sonatype OSS Releases repository defined in your build, but if you don't, add this to your SBT build file (most likely build.sbt or project/build.scala):
 ```scala
-resolvers ++= Seq(
-  "Sonatype OSS Releases"  at "http://oss.sonatype.org/content/repositories/releases/",
-)
+resolvers += Resolver.jcenterRepo
 ```
 
 Now add the Ficus dependency to your build SBT file as well:
 ```scala
 // for Scala 2.10.x
-libraryDependencies += "net.ceedubs" %% "ficus" % "1.0.1"
+libraryDependencies += "com.iheart" %% "ficus" % "1.0.1"
 
 // for Scala 2.11.x
-libraryDependencies += "net.ceedubs" %% "ficus" % "1.1.2"
+libraryDependencies += "com.iheart" %% "ficus" % "1.1.2"
 ```
 If you want to take advantage of Ficus's ability to automatically hydrate arbitrary traits and classes from configuration, you need to be on Scala version 2.10.2 or higer, because this functionality depends on implicit macros.
 
-Release notes are available on the [Ficus wiki](https://github.com/ceedubs/ficus/wiki).
+Release notes are available on the [Ficus wiki](https://github.com/iheartradio/ficus/wiki).
 
 # Built-in readers #
 Out of the box, Ficus can read most types from config:
@@ -88,7 +75,7 @@ If you would like to be more judicial about what you import (either to prevent n
 
 You will probably want to `import net.ceedubs.ficus.Ficus.toFicusConfig`, which will provide an implicit conversion from Typesafe `Config` to `FicusConfig`, giving you the `as` method.
 
-You will then need a [ValueReader](https://github.com/ceedubs/ficus/blob/master/src/main/scala/net/ceedubs/ficus/readers/ValueReader.scala) for each type that you want to grab using `as`. You can choose whether you would like to get the reader via an import or a mixin Trait. For example, if you want to be able to call `as[String]`, you can either `import net.ceedubs.ficus.FicusConfig.stringValueReader` or you can add `with net.ceedubs.ficus.readers.StringReader` to your class definition.
+You will then need a [ValueReader](https://github.com/iheartradio/ficus/blob/master/src/main/scala/net/ceedubs/ficus/readers/ValueReader.scala) for each type that you want to grab using `as`. You can choose whether you would like to get the reader via an import or a mixin Trait. For example, if you want to be able to call `as[String]`, you can either `import net.ceedubs.ficus.FicusConfig.stringValueReader` or you can add `with net.ceedubs.ficus.readers.StringReader` to your class definition.
 
 If instead you want to be able to call `as[Option[String]]`, you would need to bring an implicit `ValueReader` for `Option` into scope (via `import net.ceedubs.ficus.FicusConfig.optionValueReader` for example), but then you would also need to bring the `String` value reader into scope as described above, since the `Option` value reader delegates through to the relevant value reader after checking that a config value exists at the given path.
 
@@ -114,6 +101,6 @@ When you call `as[String]("somePath")`, Ficus config knows how to extract a Stri
 
 # Contributions #
 
-Many thanks to all of [those who have contributed](https://github.com/ceedubs/ficus/blob/master/CONTRIBUTORS.md) to Ficus.
+Many thanks to all of [those who have contributed](https://github.com/iheartradio/ficus/blob/master/CONTRIBUTORS.md) to Ficus.
 
-Would you like to contribute to Ficus? Pull requests are welcome and encouraged! Please note that contributions will be under the [MIT license](https://github.com/ceedubs/ficus/blob/master/LICENSE). Please provide unit tests along with code contributions.
+Would you like to contribute to Ficus? Pull requests are welcome and encouraged! Please note that contributions will be under the [MIT license](https://github.com/iheartradio/ficus/blob/master/LICENSE). Please provide unit tests along with code contributions.

@@ -1,9 +1,17 @@
 language: scala
+
 scala:
-  - 2.11.0
+  - 2.11.7
 jdk:
   - openjdk7
   - oraclejdk7
 
+cache:
+  directories:
+  - $HOME/.ivy2/cache
+  - $HOME/.sbt/boot/
+
 install: /bin/true
-script: ./sbt -J-Xss1M -J-Xms512M -J-Xmx512M -J-XX:MaxPermSize=128M ";clean;compile;test"
+
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts travis-jvmopts clean test

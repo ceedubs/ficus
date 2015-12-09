@@ -1,25 +1,10 @@
 /* basic project info */
 name := "ficus"
 
-organization := "net.ceedubs"
-
 description := "A Scala-friendly wrapper companion for Typesafe config"
-
-homepage := Some(url("https://github.com/ceedubs/ficus"))
 
 startYear := Some(2013)
 
-licenses := Seq(
-  "MIT License" -> url("http://www.opensource.org/licenses/mit-license.html")
-)
-
-scmInfo := Some(
-  ScmInfo(
-    url("https://github.com/ceedubs/ficus"),
-    "scm:git:https://github.com/ceedubs/ficus.git",
-    Some("scm:git:git@github.com:ceedubs/ficus.git")
-  )
-)
 
 /* scala versions and options */
 scalaVersion := "2.11.0"
@@ -77,33 +62,12 @@ traceLevel := 5
 
 offline := false
 
-/* publishing */
-publishMavenStyle := true
-
-publishTo <<= version { (v: String) =>
-  val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT")) Some(
-    "snapshots" at nexus + "content/repositories/snapshots"
-  )
-  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
-
 mappings in (Compile, packageBin) ~= { (ms: Seq[(File, String)]) =>
   ms filter { case (file, toPath) =>
       toPath != "application.conf"
   }
 }
 
-publishArtifact in Test := false
+Publish.settings
 
-pomIncludeRepository := { _ => false }
 
-pomExtra := (
-  <developers>
-    <developer>
-      <id>ceedubs</id>
-      <name>Cody Allen</name>
-      <email>ceedubs@gmail.com</email>
-    </developer>
-  </developers>
-)
