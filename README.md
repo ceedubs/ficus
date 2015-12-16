@@ -49,7 +49,10 @@ Now add the Ficus dependency to your build SBT file as well:
 // for Scala 2.10.x
 libraryDependencies += "com.iheart" %% "ficus" % "1.0.2"
 
-// for Scala 2.11.x
+// for Scala 2.11.x and Java 7
+libraryDependencies += "com.iheart" %% "ficus" % "1.1.3"
+
+// for Scala 2.11.x and Java 8
 libraryDependencies += "com.iheart" %% "ficus" % "1.2.0"
 ```
 If you want to take advantage of Ficus's ability to automatically hydrate arbitrary traits and classes from configuration, you need to be on Scala version 2.10.2 or higer, because this functionality depends on implicit macros.

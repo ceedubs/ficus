@@ -1,10 +1,12 @@
 language: scala
+sudo: required
+dist: trusty
 
 scala:
   - 2.11.7
 jdk:
   - oraclejdk8
-
+  - openjdk8
 cache:
   directories:
   - $HOME/.ivy2/cache
