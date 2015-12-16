@@ -30,8 +30,7 @@ scalacOptions <++= scalaVersion map { sv =>
     "-feature",
     "-language:postfixOps",
     "-language:implicitConversions",
-    "-language:higherKinds",
-    "-target:jvm-1.8"
+    "-language:higherKinds"
   )
   else 
     List("-target:jvm-1.8")
