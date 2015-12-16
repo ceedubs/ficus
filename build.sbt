@@ -43,7 +43,7 @@ libraryDependencies <++= scalaVersion { sv =>
     "org.specs2"     %% "specs2"         % "2.3.11"   % "test",
     "org.scalacheck" %% "scalacheck"     % "1.11.3"   % "test",
     "com.chuusai"    %% "shapeless"      % "2.0.0"    % "test",
-    "com.typesafe"   %  "config"         % "1.2.1",
+    "com.typesafe"   %  "config"         % "1.3.0",
     "org.scala-lang" %  "scala-reflect"  % sv         % "provided")
 }
 
