@@ -30,9 +30,11 @@ scalacOptions <++= scalaVersion map { sv =>
     "-feature",
     "-language:postfixOps",
     "-language:implicitConversions",
-    "-language:higherKinds"
+    "-language:higherKinds",
+    "-target:jvm-1.8"
   )
-  else Nil
+  else 
+    List("-target:jvm-1.8")
 }
 
 javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
