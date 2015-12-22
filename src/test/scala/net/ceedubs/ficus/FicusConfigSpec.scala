@@ -1,7 +1,7 @@
 package net.ceedubs.ficus
 
 import com.typesafe.config.ConfigFactory
-import Ficus.{ booleanValueReader, optionValueReader, toFicusConfig }
+import Ficus.{ booleanValueReader, optionValueReader, stringValueReader, toFicusConfig }
 
 class FicusConfigSpec extends Spec { def is = s2"""
   A Ficus config should
@@ -30,6 +30,18 @@ class FicusConfigSpec extends Spec { def is = s2"""
   def getAsNone = {
     val cfg = ConfigFactory.parseString("myValue = true")
     cfg.getAs[Boolean]("nonValue") must beNone
+  }
+
+  def getFromConfig = {
+    val configString = "arealstring"
+    val cfg = ConfigFactory.parseString(s"myValue = $configString")
+    cfg.getOrElse("myValue", "notarealstring") must beEqualTo(configString)
+  }
+
+  def getFromDefault = {
+    val cfg = ConfigFactory.parseString("myValue = arealstring")
+    val default = "adefaultstring"
+    cfg.getOrElse("nonValue", default) must beEqualTo(default)
   }
 
   def acceptAConfigKey = prop { b: Boolean =>
