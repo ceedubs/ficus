@@ -64,6 +64,7 @@ Out of the box, Ficus can read most types from config:
 * Collections (`List[A]`, `Set[A]`, `Map[String, A]`, `Array[A]`, etc. All types with a CanBuildFrom instance are supported)
 * `Config` and `ConfigValue` (Typesafe config/value)
 * `FiniteDuration`
+* `BigDecimal` and `BigInt`
 * Most arbitrary classes (as well as traits that have an apply method for instantiation). See [Arbitrary type support](#arbitrary-type-support)
 
 In this context, `A` means any type for which a `ValueReader` is already defined. For example, `Option[String]` is supported out of the box because `String` is. If you want to be able to extract an `Option[Foo[A]]` for some some type `Foo` that doesn't meet the supported type requirements (for example, this `Foo` has a type parameter), the option part is taken care of, but you will need to provide the implementation for extracting a `Foo[A]` from config. See [Custom extraction](#custom-extraction).
