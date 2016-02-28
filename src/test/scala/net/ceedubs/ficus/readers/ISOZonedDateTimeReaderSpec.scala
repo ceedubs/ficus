@@ -4,12 +4,10 @@ package readers
 import java.time.{ZoneId, ZonedDateTime}
 
 import com.typesafe.config.ConfigFactory
-import org.scalacheck.Prop
-import ConfigSerializerOps._
 
 import Ficus.{toFicusConfig, isoZonedDateTimeReader}
 
-class ISOZonedDateTimeReaderSpec extends Spec with StringReader { def is = s2"""
+class ISOZonedDateTimeReaderSpec extends Spec { def is = s2"""
   The ISOZonedDateTimeReader should
     read a ZonedDateTime in ISO format $readZonedDateTime
   """
