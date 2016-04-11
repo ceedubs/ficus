@@ -33,7 +33,7 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
       mapValueReader[A].read(cfg, "myValue") must beEqualTo(map)
     }
 
-    reads[String] and reads[Boolean] and reads[Int] and reads[Long] and reads[Double]
+    reads[String] && reads[Boolean] && reads[Int] && reads[Long] && reads[Double]
   }
 
   def readNestedMap = {
@@ -62,7 +62,7 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
       }
     }
 
-    reads[String] and reads[Boolean] and reads[Int] and reads[Long] and reads[Double]
+    reads[String] && reads[Boolean] && reads[Int] && reads[Long] && reads[Double]
   }
 
   def readCollectionUsedDirectly = {
@@ -75,15 +75,15 @@ class CollectionReadersSpec extends Spec with CollectionReaders { def is = s2"""
 object CollectionReaderSpec {
   import scala.collection._
 
-  implicit def buildableIndexedSeq[T]: Buildable[T, IndexedSeq] = new Buildable[T, IndexedSeq] {
+  implicit def buildableIndexedSeq[T]: Buildable[T, IndexedSeq[T]] = new Buildable[T, IndexedSeq[T]] {
     def builder = IndexedSeq.newBuilder[T]
   }
 
-  implicit def buildableVector[T]: Buildable[T, Vector] = new Buildable[T, Vector] {
+  implicit def buildableVector[T]: Buildable[T, Vector[T]] = new Buildable[T, Vector[T]] {
     def builder = Vector.newBuilder[T]
   }
 
-  implicit def buildableIterable[T]: Buildable[T, Iterable] = new Buildable[T, Iterable] {
+  implicit def buildableIterable[T]: Buildable[T, Iterable[T]] = new Buildable[T, Iterable[T]] {
     def builder = new mutable.ListBuffer[T]
   }
 }

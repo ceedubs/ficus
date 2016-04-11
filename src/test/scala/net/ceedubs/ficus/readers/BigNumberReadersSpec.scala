@@ -2,9 +2,9 @@ package net.ceedubs.ficus.readers
 
 import com.typesafe.config.ConfigFactory
 import net.ceedubs.ficus.Spec
-import org.specs2.specification.Fragments
+import org.specs2.specification.core.Fragments
 
-class BigNumberReadersSpec extends Spec with BigNumberReaders {def is: Fragments = s2"""
+class BigNumberReadersSpec extends Spec with BigNumberReaders { def is = s2"""
   The BigDecimal value reader should
     read a double $readDoubleAsBigDecimal
     read a long $readLongAsBigDecimal

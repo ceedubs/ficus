@@ -5,7 +5,7 @@ import com.typesafe.config.ConfigFactory
 import scala.concurrent.duration._
 import org.scalacheck.{Gen, Prop}
 
-class DurationReadersSpec extends Spec with DurationReaders with DeactivatedTimeConversions { def is = s2"""
+class DurationReadersSpec extends Spec with DurationReaders { def is = s2"""
   The finite duration reader should
     read a millisecond value $readMillis
     read a minute value $readMinutes
@@ -21,9 +21,4 @@ class DurationReadersSpec extends Spec with DurationReaders with DeactivatedTime
     finiteDurationReader.read(cfg, "myValue") must beEqualTo(i minutes)
   }
 
-}
-
-/* specs2 time conversions conflict with scala.concurrent.duration time conversions */
-trait DeactivatedTimeConversions extends org.specs2.time.TimeConversions {
-  override def intToRichLong(v: Int) = super.intToRichLong(v)
 }
