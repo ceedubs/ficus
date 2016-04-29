@@ -69,7 +69,7 @@ libraryDependencies += "com.iheart" %% "ficus" % "1.1.3"
 
 // for Scala 2.11.x and Java 8
 // See the latest version in the download badge below.
-libraryDependencies += "com.iheart" %% "ficus" % "1.2.0"
+libraryDependencies += "com.iheart" %% "ficus" % "1.2.3"
 ```
 
 [ ![Download](https://api.bintray.com/packages/iheartradio/maven/ficus/images/download.svg) ](https://bintray.com/iheartradio/maven/ficus/_latestVersion)
