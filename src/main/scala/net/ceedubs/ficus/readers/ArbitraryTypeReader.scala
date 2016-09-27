@@ -1,51 +1,16 @@
 package net.ceedubs.ficus.readers
 
-import net.ceedubs.ficus.util.ReflectionUtils
 import com.typesafe.config.Config
-import scala.language.experimental.macros
-import scala.reflect.internal.{StdNames, SymbolTable, Definitions}
 import macrocompat.bundle
+import net.ceedubs.ficus.readers.namemappers.NameMapper
+import net.ceedubs.ficus.util.ReflectionUtils
+
+import scala.language.experimental.macros
+import scala.reflect.internal.{Definitions, StdNames, SymbolTable}
 import scala.reflect.macros.blackbox
 
 trait ArbitraryTypeReader {
   implicit def arbitraryTypeValueReader[T]: ValueReader[T] = macro ArbitraryTypeReaderMacros.arbitraryTypeValueReader[T]
-}
-
-/**
-  * Helper object to get the current name mapper
-  */
-object NameMapper {
-
-  /**
-    * Gets the name mapper from the implicit scope
-    * @param nameMapper The name mapper from the implicit scope, or the default name mapper if not found
-    * @return The name mapper to be used in current implicit scope
-    */
-  def apply()(implicit nameMapper: NameMapper = DefaultNameMapper): NameMapper = nameMapper
-
-}
-
-/**
-  * Defines an object that knows to map between names as they found in the code
-  * to those who should be defined in the configuration
-  */
-trait NameMapper {
-
-  /**
-    * Maps between the name in the code to name in configuration
-    * @param name The name as found in the code
-    */
-  def map(name: String): String
-
-}
-
-/**
-  * Default implementation for name mapper, names in code equivalent to names in configuration
-  */
-case object DefaultNameMapper extends NameMapper {
-
-  override def map(name: String): String = name
-
 }
 
 object ArbitraryTypeReader extends ArbitraryTypeReader
@@ -60,7 +25,7 @@ class ArbitraryTypeReaderMacros(val c: blackbox.Context) extends ReflectionUtils
         def read(config: Config, path: String): T = instantiateFromConfig[T](
           config = c.Expr[Config](Ident(TermName("config"))),
           path = c.Expr[String](Ident(TermName("path"))),
-          mapper = c.Expr[NameMapper](q"""_root_.net.ceedubs.ficus.readers.NameMapper()""")).splice
+          mapper = c.Expr[NameMapper](q"""_root_.net.ceedubs.ficus.readers.namemappers.NameMapper()""")).splice
       }
     }
   }
