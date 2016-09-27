@@ -3,6 +3,7 @@ package readers
 
 import com.typesafe.config.ConfigFactory
 import ConfigSerializerOps._
+import net.ceedubs.ficus.readers.namemappers.NameMapper
 import shapeless.test.illTyped
 
 class ArbitraryTypeReaderSpec extends Spec { def is = s2"""
