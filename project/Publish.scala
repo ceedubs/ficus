@@ -13,7 +13,7 @@ object Publish {
 
     organization in ThisBuild := "com.iheart",
     publishMavenStyle := true,
-    licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.html")),
+    licenses := Seq("MIT" -> url("http://www.opensource.org/licenses/mit-license.html")),
     homepage := Some(url("http://iheartradio.github.io/ficus")),
     scmInfo := Some(ScmInfo(
       url("https://github.com/iheartradio/ficus"),
