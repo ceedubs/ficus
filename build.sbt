@@ -43,7 +43,9 @@ libraryDependencies ++= Seq(
 )
 
 resolvers ++= Seq(
-  Resolver.sonatypeRepo("snapshots")
+  Resolver.sonatypeRepo("snapshots"),
+  Resolver.bintrayRepo("iheartradio","maven"),
+  Resolver.jcenterRepo
 )
 
 parallelExecution in Test := true
