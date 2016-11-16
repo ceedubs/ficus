@@ -2,7 +2,7 @@ package net.ceedubs.ficus.readers
 
 import scala.concurrent.duration.FiniteDuration
 import com.typesafe.config.Config
-import scala.concurrent.duration.MILLISECONDS
+import scala.concurrent.duration.{Duration, NANOSECONDS}
 
 trait DurationReaders {
 
@@ -13,8 +13,8 @@ trait DurationReaders {
    */
   implicit def finiteDurationReader: ValueReader[FiniteDuration] = new ValueReader[FiniteDuration] {
     def read(config: Config, path: String): FiniteDuration = {
-      val millis = config.getDuration(path, java.util.concurrent.TimeUnit.MILLISECONDS)
-      FiniteDuration(millis, MILLISECONDS)
+      val nanos = config.getDuration(path, NANOSECONDS)
+      Duration.fromNanos(nanos)
     }
   }
 }
