@@ -58,7 +58,7 @@ For more detailed examples and how they match up with what's defined in a config
 # Adding the dependency #
 You most likely already have the Sonatype OSS Releases repository defined in your build, but if you don't, add this to your SBT build file (most likely build.sbt or project/build.scala):
 ```scala
-resolvers += Resolver.jcenterRepo
+resolvers +=  Resolver.bintrayRepo("iheartradio","maven")
 ```
 
 Now add the Ficus dependency to your build SBT file as well:
