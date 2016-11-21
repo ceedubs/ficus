@@ -1,6 +1,23 @@
 // Your profile name of the sonatype account. The default is the same with the organization value
 sonatypeProfileName := "com.iheart"
 
+import ReleaseTransformations._
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  ReleaseStep(action = Command.process("publishSigned", _)),
+  setNextVersion,
+  commitNextVersion,
+  ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+  pushChanges
+)
+
 pomExtra in Global := {
   <url>https://github.com/iheartradio/ficus/</url>
   <licenses>
