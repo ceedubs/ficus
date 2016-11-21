@@ -1,13 +1,27 @@
+import com.typesafe.sbt.pgp.PgpKeys
 import sbt._, Keys._
-import bintray.BintrayKeys._
+import sbtrelease.ReleasePlugin.autoImport._
+import sbtrelease.ReleaseStateTransformations._
 
 
 object Publish {
 
-  val bintraySettings = Seq(
-    bintrayOrganization := Some("iheartradio"),
-    bintrayPackageLabels := Seq("typesafe-config", "parser", "config")
-  )
+  pomExtra in Global := {
+
+      <developers>
+        <developer>
+          <id>ceedubs</id>
+          <name>Cody Allen</name>
+          <email>ceedubs@gmail.com</email>
+        </developer>
+        <developer>
+          <id>kailuowang</id>
+          <name>Kailuo Wang</name>
+          <email>kailuo.wang@gmail.com</email>
+        </developer>
+      </developers>
+  }
+
 
   val publishingSettings = Seq(
 
@@ -34,8 +48,26 @@ object Publish {
           <email>kailuo.wang@gmail.com</email>
         </developer>
       </developers>
-      )
+      ),
+    releaseCrossBuild := true,
+    releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+
+    releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,
+      inquireVersions,
+      runClean,
+      runTest,
+      setReleaseVersion,
+      commitReleaseVersion,
+      tagRelease,
+      publishArtifacts,
+      setNextVersion,
+      commitNextVersion,
+      ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+      pushChanges
+    )
+
   )
 
-  val settings = bintraySettings ++ publishingSettings
+  val settings = publishingSettings
 }
