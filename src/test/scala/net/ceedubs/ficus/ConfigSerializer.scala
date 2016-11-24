@@ -1,6 +1,7 @@
 package net.ceedubs.ficus
 
-import com.typesafe.config.ConfigUtil
+import com.typesafe.config.{ConfigFactory, ConfigUtil}
+
 import scala.language.implicitConversions
 
 trait ConfigSerializer[A] {
@@ -45,9 +46,10 @@ object ConfigSerializer {
 
 final case class ConfigSerializerOps[A](a: A, serializer: ConfigSerializer[A]) {
   def asConfigValue: String = serializer.serialize(a)
+  def toConfigValue = ConfigFactory.parseString( s"dummy=$asConfigValue").root().get("dummy")
 }
 
-object ConfigSerializerOps {
+  object ConfigSerializerOps {
   implicit def toConfigSerializerOps[A](a: A)(implicit serializer: ConfigSerializer[A]): ConfigSerializerOps[A] =
     ConfigSerializerOps[A](a, serializer)
 }
