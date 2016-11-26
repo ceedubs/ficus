@@ -1,9 +1,6 @@
 package net.ceedubs.ficus.readers
 import com.typesafe.config.{Config, ConfigException}
 
-/**
-  * Created by eyalf on 11/24/2016.
-  */
 trait EitherReader {
   implicit def eitherReader[L,R]( implicit lReader : ValueReader[L], rReader : ValueReader[R]) : ValueReader[Either[L,R]] =
     new ValueReader[Either[L,R]]{

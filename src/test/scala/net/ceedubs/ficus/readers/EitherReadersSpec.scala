@@ -8,9 +8,6 @@ import org.scalacheck.Arbitrary
 import scala.util.{Failure, Try}
 import scala.collection.JavaConverters._
 
-/**
-  * Created by eyalf on 11/24/2016.
-  */
 class EitherReadersSpec extends Spec with EitherReader with OptionReader with AnyValReaders with StringReader with TryReader with CollectionReaders{
   def is=s2"""
     An Either value reader should
