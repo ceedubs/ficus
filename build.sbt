@@ -8,9 +8,9 @@ description := "A Scala-friendly wrapper companion for Typesafe config"
 startYear := Some(2013)
 
 /* scala versions and options */
-scalaVersion := "2.12.0"
+scalaVersion := "2.11.8"
 
-crossScalaVersions := Seq(scalaVersion.value, "2.10.6", "2.11.8")
+crossScalaVersions := Seq(scalaVersion.value, "2.10.6", "2.12.0")
 
 // These options will be used for *all* versions.
 scalacOptions ++= Seq(
@@ -68,11 +68,9 @@ Publish.settings
 
 releaseCrossBuild := true
 
-mimaPreviousArtifacts := (if (scalaBinaryVersion.value != "2.10") {
-  Version(version.value).map {
-    case Version(major, subversions, _) =>
-      val (minor :: bugfix :: _) = subversions.toList
+mimaPreviousArtifacts :=
+  Version(version.value).collect {
+    case Version(major, (minor :: bugfix :: _), _) if (scalaBinaryVersion.value != "2.10") && bugfix > 0 =>
       Set(organization.value %% name.value % Seq(major, minor, bugfix - 1).mkString("."))
   }.getOrElse(Set.empty)
-} else Set.empty)
 
