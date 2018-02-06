@@ -13,6 +13,7 @@ Ficus adds an `as[A]` method to a normal [Typesafe Config](http://lightbend.gith
 # Examples #
 ```scala
 import net.ceedubs.ficus.Ficus._
+import com.typesafe.config.ConfigFactory
 
 object Country extends Enumeration {
   val DE = Value("DE")
