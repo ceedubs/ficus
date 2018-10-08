@@ -8,9 +8,9 @@ description := "A Scala-friendly wrapper companion for Typesafe config"
 startYear := Some(2013)
 
 /* scala versions and options */
-scalaVersion := "2.11.11"
+scalaVersion := "2.12.7"
 
-crossScalaVersions := Seq(scalaVersion.value, "2.10.6", "2.12.3")
+crossScalaVersions := Seq("2.10.7", "2.11.12", scalaVersion.value)
 
 // These options will be used for *all* versions.
 scalacOptions ++= Seq(
@@ -20,6 +20,7 @@ scalacOptions ++= Seq(
   "-encoding", "UTF-8",
   "-target:jvm-1." + {
     CrossVersion.partialVersion(scalaVersion.value).collect {
+      case (2, minor) if minor <= 10  & scalaVersion.value == "2.10.7" => "8"
       case (2, minor) if minor <= 10 => "7"
     }.getOrElse("8")
   }
@@ -31,15 +32,15 @@ javacOptions ++= Seq(
 
 /* dependencies */
 libraryDependencies ++= Seq(
-  "org.specs2"     %% "specs2-core"       % "3.8.6"  % "test",
-  "org.specs2"     %% "specs2-scalacheck" % "3.8.6"  % "test",
-  "org.scalacheck" %% "scalacheck"        % "1.13.4" % "test",
-  "com.chuusai"    %% "shapeless"         % "2.3.2"  % "test",
-  "com.typesafe"   %  "config"            % "1.3.2",
-  "org.scala-lang" %  "scala-reflect"     % scalaVersion.value % "provided",
-  "org.scala-lang" % "scala-compiler"     % scalaVersion.value % "provided",
+  "org.specs2"     %% "specs2-core"       % "3.10.0" % Test,
+  "org.specs2"     %% "specs2-scalacheck" % "3.10.0" % Test,
+  "org.scalacheck" %% "scalacheck"        % "1.14.0" % Test,
+  "com.chuusai"    %% "shapeless"         % "2.3.3"  % Test,
+  "com.typesafe"   %  "config"            % "1.3.3",
+  "org.scala-lang" %  "scala-reflect"     % scalaVersion.value % Provided,
+  "org.scala-lang" %  "scala-compiler"    % scalaVersion.value % Provided,
   "org.typelevel"  %% "macro-compat"      % "1.1.1",
-  compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+  compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
 )
 
 resolvers ++= Seq(
@@ -74,3 +75,13 @@ mimaPreviousArtifacts :=
       Set(organization.value %% name.value % Seq(major, minor, bugfix - 1).mkString("."))
   }.getOrElse(Set.empty)
 
+val gc = TaskKey[Unit]("gc", "runs garbage collector")
+val gcTask = gc := {
+  println("requesting garbage collection")
+  System gc()
+}
+
+lazy val project = Project("project", file("."))
+  .settings(
+    gcTask
+  )
