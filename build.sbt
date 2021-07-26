@@ -29,7 +29,7 @@ ThisBuild / githubWorkflowUseSbtThinClient := false
 
 ThisBuild / githubWorkflowPublishTargetBranches := Seq()
 
-ThisBuild / crossScalaVersions := Seq("2.10.7", "2.11.12", "2.13.6", "2.12.14")
+ThisBuild / crossScalaVersions := Seq("2.10.7", "2.11.12", "2.13.6", "3.0.1", "2.12.14")
 ThisBuild / scalaVersion       := (ThisBuild / crossScalaVersions).value.last
 
 // Coveralls doesn't really work with Scala 2.10.7 so we are disabling it for CI
@@ -65,34 +65,44 @@ lazy val root = project
       "-Xlint:deprecation"
     ),
     Compile / unmanagedSourceDirectories ++= {
-      (Compile / unmanagedSourceDirectories).value.map { dir =>
+      (Compile / unmanagedSourceDirectories).value.flatMap { dir =>
         CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, 13)) => file(dir.getPath ++ "-2.13+")
-          case _             => file(dir.getPath ++ "-2.13-")
+          case Some((2, 13)) => Seq(file(dir.getPath ++ "-2.13+"))
+          case Some((2, _))  => Seq(file(dir.getPath ++ "-2.13-"))
+          case _             => Nil
         }
       }
     },
     Test / unmanagedSourceDirectories ++= {
-      (Test / unmanagedSourceDirectories).value.map { dir =>
+      (Test / unmanagedSourceDirectories).value.flatMap { dir =>
         CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, 13)) => file(dir.getPath ++ "-2.13+")
-          case _             => file(dir.getPath ++ "-2.13-")
+          case Some((2, 13)) => Seq(file(dir.getPath ++ "-2.13+"))
+          case Some((2, _))  => Seq(file(dir.getPath ++ "-2.13-"))
+          case _             => Nil
         }
       }
     },
     libraryDependencies ++=
-      (if (scalaVersion.value.startsWith("2.10"))
-         Seq("org.specs2" %% "specs2-core" % "3.10.0" % Test, "org.specs2" %% "specs2-scalacheck" % "3.10.0" % Test)
-       else
-         Seq("org.specs2" %% "specs2-core" % "4.8.3"  % Test, "org.specs2" %% "specs2-scalacheck" % "4.8.3"  % Test)) ++
+      (if (scalaVersion.value.startsWith("2.")) {
+         val specs2Version = if (scalaVersion.value.startsWith("2.10")) "3.10.0" else "4.8.3"
+         Seq(
+           "org.specs2"    %% "specs2-core"       % specs2Version      % Test,
+           "org.specs2"    %% "specs2-scalacheck" % specs2Version      % Test,
+           "com.chuusai"   %% "shapeless"         % "2.3.3"            % Test,
+           "org.scala-lang" % "scala-reflect"     % scalaVersion.value % Provided,
+           "org.scala-lang" % "scala-compiler"    % scalaVersion.value % Provided
+         )
+       } else
+         Seq(
+           "org.specs2"    %% "specs2-core"         % "5.0.0-ALPHA-03" % Test,
+           "org.specs2"    %% "specs2-scalacheck"   % "5.0.0-ALPHA-03" % Test,
+           "org.typelevel" %% "shapeless3-typeable" % "3.0.2"          % Test
+         )) ++
         Seq(
-          "org.scalacheck" %% "scalacheck"     % "1.14.1"           % Test,
-          "com.chuusai"    %% "shapeless"      % "2.3.3"            % Test,
-          "com.typesafe"    % "config"         % "1.3.4",
-          "org.scala-lang"  % "scala-reflect"  % scalaVersion.value % Provided,
-          "org.scala-lang"  % "scala-compiler" % scalaVersion.value % Provided
+          "org.scalacheck" %% "scalacheck" % "1.15.4" % Test,
+          "com.typesafe"    % "config"     % "1.3.4"
         ) ++
-        (if (!scalaVersion.value.startsWith("2.13"))
+        (if (scalaVersion.value.startsWith("2.") && !scalaVersion.value.startsWith("2.13"))
            Seq(
              compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full),
              "org.typelevel" %% "macro-compat" % "1.1.1"
