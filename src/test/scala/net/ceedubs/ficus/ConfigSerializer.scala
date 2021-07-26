@@ -2,8 +2,6 @@ package net.ceedubs.ficus
 
 import com.typesafe.config.{ConfigFactory, ConfigUtil, ConfigValue}
 
-import scala.language.implicitConversions
-
 trait ConfigSerializer[A] {
   def serialize(a: A): String
 }

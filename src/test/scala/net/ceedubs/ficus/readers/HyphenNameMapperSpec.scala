@@ -21,7 +21,7 @@ class HyphenNameMapperSpec extends Spec with DataTables {
     val camelCased = (foos.head +: foos.tail.map(_.capitalize)).mkString
     val hyphenated = foos.mkString("-").toLowerCase
 
-    HyphenNameMapper.map(camelCased) must_== hyphenated
+    HyphenNameMapper.map(camelCased) must beEqualTo(hyphenated)
   }
 
   def hyphenateWithDigits =
@@ -30,6 +30,6 @@ class HyphenNameMapperSpec extends Spec with DataTables {
       "1144StartsWithA32422" !! "1144-starts-with-a-32422" |
       "get13HTML42Snippets" !! "get-13-html-42-snippets" |
       "thisOneIs13InThe43Middle" !! "this-one-is-13-in-the-43-middle" | { (camelCased, hyphenated) =>
-        HyphenNameMapper.map(camelCased) must_== hyphenated
+        HyphenNameMapper.map(camelCased) must beEqualTo(hyphenated)
       }
 }

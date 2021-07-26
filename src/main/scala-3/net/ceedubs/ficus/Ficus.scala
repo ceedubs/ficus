@@ -2,7 +2,6 @@ package net.ceedubs.ficus
 
 import com.typesafe.config.Config
 import net.ceedubs.ficus.readers._
-import scala.language.implicitConversions
 
 trait FicusInstances
     extends AnyValReaders
@@ -23,5 +22,16 @@ trait FicusInstances
     with InetSocketAddressReaders
 
 object Ficus extends FicusInstances {
-  implicit def toFicusConfig(config: Config): FicusConfig = SimpleFicusConfig(config)
+  extension (config: Config) {
+    def to[A](path: String)(implicit reader: ValueReader[A]): A = reader.read(config, path)
+
+    def as[A](implicit reader: ValueReader[A]): A = to(".")
+
+    def getAs[A](path: String)(implicit reader: ValueReader[Option[A]]): Option[A] = reader.read(config, path)
+
+    def getOrElse[A](path: String, default: => A)(implicit reader: ValueReader[Option[A]]): A =
+      getAs[A](path).getOrElse(default)
+
+    def apply[A](key: ConfigKey[A])(implicit reader: ValueReader[A]): A = to[A](key.path)
+  }
 }
