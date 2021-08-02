@@ -10,7 +10,7 @@ class Issue82Spec extends Specification {
     "not throw `java.lang.ClassCastException`" in {
       case class TestSettings(val `foo-bar`: Long, `foo`: String)
       val config = ConfigFactory.parseString("""{ foo-bar: 3, foo: "4" }""")
-      config.as[TestSettings] must not(throwA[java.lang.ClassCastException])
+      config.to[TestSettings] must not(throwA[java.lang.ClassCastException])
     }
 
     """should not assign "foo-bar" to "foo"""" in {

@@ -16,7 +16,7 @@ trait CollectionReaders {
       factory: Factory[A, C[A]]
   ): ValueReader[C[A]]                                                                              = new ValueReader[C[A]] {
     def read(config: Config, path: String): C[A] = {
-      val list    = config.getList(path).asScala
+      val list                      = config.getList(path).asScala
       val builder: Builder[A, C[A]] = factory.newBuilder
       builder.sizeHint(list.size)
       list foreach { entry =>

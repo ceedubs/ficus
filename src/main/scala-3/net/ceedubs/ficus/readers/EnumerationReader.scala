@@ -1,7 +1,5 @@
 package net.ceedubs.ficus.readers
 
-trait EnumerationReader {
-
-}
+trait EnumerationReader {}
 
 object EnumerationReader extends EnumerationReader

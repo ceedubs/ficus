@@ -30,7 +30,7 @@ ThisBuild / githubWorkflowUseSbtThinClient := false
 ThisBuild / githubWorkflowPublishTargetBranches := Seq()
 
 ThisBuild / crossScalaVersions := Seq("2.10.7", "2.11.12", "2.13.6", "3.0.1", "2.12.14")
-ThisBuild / scalaVersion       := (ThisBuild / crossScalaVersions).value.last
+ThisBuild / scalaVersion       := "3.0.2-RC1"
 
 // Coveralls doesn't really work with Scala 2.10.7 so we are disabling it for CI
 ThisBuild / githubWorkflowScalaVersions -= "2.10.7"
@@ -43,6 +43,7 @@ lazy val root = project
     description                     := "A Scala-friendly wrapper companion for Typesafe config",
     startYear                       := Some(2013),
     scalacOptions ++= Seq(
+      "-language:implicitConversions",
       "-feature",
       "-deprecation",
       "-unchecked",

@@ -6,9 +6,11 @@ import net.ceedubs.ficus.readers.{AllValueReaderInstances, ValueReader}
 trait FicusConfig {
   def config: Config
 
+  def self: FicusConfig = this
+
   def as[A](path: String)(implicit reader: ValueReader[A]): A = reader.read(config, path)
 
-  def as[A](implicit reader: ValueReader[A]): A = as(".")
+  def to[A](implicit reader: ValueReader[A]): A = as(".")
 
   def getAs[A](path: String)(implicit reader: ValueReader[Option[A]]): Option[A] = reader.read(config, path)
 

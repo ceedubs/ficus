@@ -3,8 +3,7 @@ package readers
 
 import java.time.{ZoneId, ZonedDateTime}
 
-import com.typesafe.config.ConfigFactory
-
+import com.typesafe.config.{Config, ConfigFactory}
 import Ficus._
 
 class ISOZonedDateTimeReaderSpec extends Spec {
@@ -14,12 +13,12 @@ class ISOZonedDateTimeReaderSpec extends Spec {
   """
 
   def readZonedDateTime = {
-    val cfg      = ConfigFactory.parseString(s"""
+    val cfg: FicusConfig      = ConfigFactory.parseString(s"""
          | foo {
          |    date = "2016-02-28T11:46:26.896+01:00[Europe/Berlin]"
          | }
        """.stripMargin)
-    val date     = cfg.to[ZonedDateTime]("foo.date")
+    val date     = cfg.as[ZonedDateTime]("foo.date")
     val expected = ZonedDateTime.of(
       2016,
       2,

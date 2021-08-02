@@ -22,16 +22,5 @@ trait FicusInstances
     with InetSocketAddressReaders
 
 object Ficus extends FicusInstances {
-  extension (config: Config) {
-    def to[A](path: String)(implicit reader: ValueReader[A]): A = reader.read(config, path)
-
-    def as[A](implicit reader: ValueReader[A]): A = to(".")
-
-    def getAs[A](path: String)(implicit reader: ValueReader[Option[A]]): Option[A] = reader.read(config, path)
-
-    def getOrElse[A](path: String, default: => A)(implicit reader: ValueReader[Option[A]]): A =
-      getAs[A](path).getOrElse(default)
-
-    def apply[A](key: ConfigKey[A])(implicit reader: ValueReader[A]): A = to[A](key.path)
-  }
+  implicit def toFicusConfig(config: Config): FicusConfig = SimpleFicusConfig(config)
 }

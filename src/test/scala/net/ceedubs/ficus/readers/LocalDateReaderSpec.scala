@@ -12,13 +12,13 @@ class LocalDateReaderSpec extends Spec {
   """
 
   def readLocalDate = {
-    val cfg       = ConfigFactory.parseString(s"""
+    val cfg: FicusConfig = ConfigFactory.parseString(s"""
          | foo {
          |    date = "2003-01-03"
          | }
        """.stripMargin)
-    val localDate = cfg.to[LocalDate]("foo.date")
-    val expected  = LocalDate.of(2003, 1, 3)
+    val localDate        = cfg.as[LocalDate]("foo.date")
+    val expected         = LocalDate.of(2003, 1, 3)
     localDate should beEqualTo(expected)
   }
 }

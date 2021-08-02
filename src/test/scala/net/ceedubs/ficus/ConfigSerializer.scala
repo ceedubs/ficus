@@ -34,7 +34,9 @@ object ConfigSerializer {
   }
   def iterableSerializer[A: ConfigSerializer]: ConfigSerializer[Iterable[A]]              = apply[Iterable[A]](serializeIterable)
 
-  implicit def stringKeyMapSerializer[A](implicit valueSerializer: ConfigSerializer[A]): ConfigSerializer[Map[String, A]] =
+  implicit def stringKeyMapSerializer[A](implicit
+      valueSerializer: ConfigSerializer[A]
+  ): ConfigSerializer[Map[String, A]] =
     new ConfigSerializer[Map[String, A]] {
       def serialize(map: Map[String, A]): String = {
         val lines = map.toIterable.map(
