@@ -1,9 +1,0 @@
-language: scala
-scala:
-  - 2.11.0
-jdk:
-  - openjdk7
-  - oraclejdk7
-
-install: /bin/true
-script: ./sbt -J-Xss1M -J-Xms512M -J-Xmx512M -J-XX:MaxPermSize=128M ";clean;compile;test"
